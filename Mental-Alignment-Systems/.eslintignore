@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.expo/
+.expo-shared/
+
+# Generated files
+*.generated.*
+coverage/
+
+# Config files
+*.config.js
+.eslintrc.js
+.prettierrc.js
+
+# Logs
+*.log
