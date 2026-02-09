@@ -10,8 +10,11 @@ export interface AuthRequest extends Request {
   user?: DecodedToken;
 }
 
+/** Request after authMiddleware - user is set */
+export type AuthenticatedRequest = Request & { user: DecodedToken };
+
 export async function authMiddleware(
-  req: AuthenticatedRequest,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> {

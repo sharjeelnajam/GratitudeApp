@@ -5,11 +5,11 @@
 
 import { Router, Response } from 'express';
 import { User } from '../schemas';
-import { authMiddleware, AuthenticatedRequest } from '../middleware/auth';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 export const authRouter = Router();
 
-authRouter.post('/sync-user', authMiddleware, async (req: AuthenticatedRequest, res: Response) => {
+authRouter.post('/sync-user', authMiddleware, async (req: AuthRequest, res: Response) => {
   console.log('[Auth] POST /auth/sync-user - hit');
   if (!req.user) {
     console.log('[Auth] sync-user - rejected: no user');

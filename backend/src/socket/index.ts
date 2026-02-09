@@ -55,7 +55,7 @@ export function initSocketServer(httpServer: import('http').Server): void {
 
     try {
       const decoded = await getAuth().verifyIdToken(token);
-      (socket as AuthenticatedSocket).user = {
+      (socket as unknown as AuthenticatedSocket).user = {
         uid: decoded.uid,
         email: decoded.email,
         name: decoded.name,
@@ -68,7 +68,7 @@ export function initSocketServer(httpServer: import('http').Server): void {
   });
 
   io.on('connection', async (socket) => {
-    const { user } = socket as AuthenticatedSocket;
+    const { user } = socket as unknown as AuthenticatedSocket;
 
     socket.on('room:join', async (payload: { roomId: string }) => {
       const { roomId } = payload ?? {};
@@ -127,7 +127,7 @@ export function initSocketServer(httpServer: import('http').Server): void {
         session.updatedAt = new Date();
         await session.save();
 
-        (socket as AuthenticatedSocket).user!.mongoUserId = dbUser._id.toString();
+        (socket as unknown as AuthenticatedSocket).user!.mongoUserId = dbUser._id.toString();
         socket.join(`room:${roomId}`);
         socket.data.roomId = roomId;
 
@@ -314,7 +314,7 @@ async function handleLeave(
   const roomId = socket.data.roomId as string | undefined;
   if (!roomId) return;
 
-  const { user } = socket as AuthenticatedSocket;
+  const { user } = socket as unknown as AuthenticatedSocket;
   if (!user) return;
 
   try {

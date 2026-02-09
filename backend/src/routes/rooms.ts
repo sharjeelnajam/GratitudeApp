@@ -4,19 +4,28 @@
  */
 
 import { Router, Response } from 'express';
+import mongoose from 'mongoose';
 import { Room } from '../schemas';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthRequest } from '../middleware/auth';
+
+type RoomLean = {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  environmentType: string;
+  maxParticipants: number;
+  activeParticipants: string[];
+};
 
 export const roomsRouter = Router();
 
-roomsRouter.get('/', async (_req: AuthenticatedRequest, res: Response) => {
+roomsRouter.get('/', async (_req: AuthRequest, res: Response) => {
   console.log('[Rooms] GET /rooms - hit');
   try {
     const rooms = await Room.find({ isActive: true })
       .select('name environmentType maxParticipants activeParticipants')
       .lean();
 
-    const list = rooms.map((r: { _id: unknown; name: string; environmentType: string; maxParticipants: number; activeParticipants: string[] }) => ({
+    const list = rooms.map((r: RoomLean) => ({
       id: r._id.toString(),
       name: r.name,
       environmentType: r.environmentType,
