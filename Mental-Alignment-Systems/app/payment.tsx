@@ -8,15 +8,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text } from '@/shared/ui';
-import { assertPaymentConfig } from '@/features/payments/config';
-import { setPaymentAccessGranted } from '@/features/payments/storage';
-import { fetchCheckoutLinks } from '@/services/billing/billingService';
+import { activateSubscription } from '@/services/billing/billingService';
 
 const { width } = Dimensions.get('window');
 const CARD_MAX_WIDTH = Math.min(width - 48, 420);
@@ -25,7 +21,11 @@ type Provider = 'paypal' | 'square';
 
 const PAYPAL_LOGO_XML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="7.056000232696533 3 37.35095977783203 45"><g clip-path="url(#a)"><path fill="#002991" d="M38.914 13.35c0 5.574-5.144 12.15-12.927 12.15H18.49l-.368 2.322L16.373 39H7.056l5.605-36h15.095c5.083 0 9.082 2.833 10.555 6.77a9.687 9.687 0 0 1 .603 3.58z"></path><path fill="#60CDFF" d="M44.284 23.7A12.894 12.894 0 0 1 31.53 34.5h-5.206L24.157 48H14.89l1.483-9 1.75-11.178.367-2.322h7.497c7.773 0 12.927-6.576 12.927-12.15 3.825 1.974 6.055 5.963 5.37 10.35z"></path><path fill="#008CFF" d="M38.914 13.35C37.31 12.511 35.365 12 33.248 12h-12.64L18.49 25.5h7.497c7.773 0 12.927-6.576 12.927-12.15z"></path></g></svg>`;
 
-const SQUARE_LOGO_XML = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 501.43"><path d="M501.43,83.79v333.84c0,46.27-37.5,83.79-83.79,83.79H83.79c-46.28,0-83.79-37.5-83.79-83.79V83.79C0,37.52,37.52,0,83.79,0h333.84c46.29,0,83.79,37.5,83.79,83.79ZM410.23,117.65c0-14.61-11.85-26.45-26.45-26.45H117.63c-14.61,0-26.45,11.84-26.45,26.45v266.19c0,14.61,11.84,26.45,26.45,26.45h266.17c14.61,0,26.45-11.85,26.45-26.45V117.65h-.02ZM182.32,197.6c0-8.43,6.79-15.26,15.17-15.26h106.4c8.39,0,15.17,6.84,15.17,15.26v106.24c0,8.43-6.75,15.26-15.17,15.26h-106.4c-8.39,0-15.17-6.84-15.17-15.26v-106.24Z"/></svg>`;
+// Simplified Square "double square" mark so it renders similarly sized to the PayPal icon.
+const SQUARE_LOGO_XML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <rect x="4" y="4" width="40" height="40" rx="8" ry="8" fill="none" stroke="#0B1020" stroke-width="3" />
+  <rect x="15" y="15" width="18" height="18" rx="4" ry="4" fill="none" stroke="#0B1020" stroke-width="3" />
+</svg>`;
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -37,29 +37,15 @@ export default function PaymentScreen() {
     setError(null);
     setLoadingProvider(provider);
     try {
-      const links = await fetchCheckoutLinks();
-      const checkoutUrlFromBackend =
-        provider === 'paypal' ? links.paypalUrl : links.squareUrl;
-      const checkoutUrl =
-        checkoutUrlFromBackend ?? assertPaymentConfig(provider);
-      const redirectUrl = Linking.createURL('/payment-complete');
-
-      const result = await WebBrowser.openAuthSessionAsync(checkoutUrl, redirectUrl);
-
-      if (result.type === 'success') {
-        await setPaymentAccessGranted();
-        router.replace('/login');
+      const subscription = await activateSubscription(provider);
+      if (!subscription.isActive) {
+        setError('Subscription could not be activated. Please try again.');
         return;
       }
-
-      if (result.type === 'cancel') {
-        setError('Payment was cancelled. You can try again anytime.');
-      } else {
-        setError('Unable to confirm payment. Please try again.');
-      }
+      router.replace('/welcome');
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : 'Something went wrong starting the payment.';
+        e instanceof Error ? e.message : 'Something went wrong starting your subscription.';
       setError(message);
     } finally {
       setLoadingProvider(null);
@@ -118,7 +104,7 @@ export default function PaymentScreen() {
               <View style={styles.card}>
                 <View style={styles.cardIconRow}>
                   <View style={[styles.pill, styles.squarePill]}>
-                    <SvgXml xml={SQUARE_LOGO_XML} width={20} height={20} />
+                    <SvgXml xml={SQUARE_LOGO_XML} width={22} height={22} />
                     <Text style={styles.pillTextDark}>Square</Text>
                   </View>
                 </View>

@@ -21,26 +21,21 @@ authRouter.post('/sync-user', authMiddleware, async (req: AuthRequest, res: Resp
   const now = new Date();
 
   try {
-    const existing = await User.findOne({ firebaseUid: uid });
-    let user;
-
-    if (existing) {
-      existing.lastLogin = now;
-      existing.email = email ?? existing.email;
-      existing.name = name ?? existing.name;
-      existing.photoURL = picture ?? existing.photoURL;
-      await existing.save();
-      user = existing;
-    } else {
-      user = await User.create({
-        firebaseUid: uid,
-        email: email ?? '',
-        name: name ?? '',
-        photoURL: picture ?? '',
-        createdAt: now,
-        lastLogin: now,
-      });
-    }
+    const user = await User.findOneAndUpdate(
+      { firebaseUid: uid },
+      {
+        $set: {
+          email: email ?? '',
+          name: name ?? '',
+          photoURL: picture ?? '',
+          lastLogin: now,
+        },
+        $setOnInsert: {
+          createdAt: now,
+        },
+      },
+      { new: true, upsert: true }
+    );
 
     console.log('[Auth] sync-user - success', { uid, email });
     res.json({

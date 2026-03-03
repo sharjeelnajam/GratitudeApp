@@ -17,6 +17,8 @@ export interface IUser extends Document {
   subscriptionCurrency?: string;
   subscriptionAmountCents?: number;
   subscriptionLastPaidAt?: Date | null;
+  subscriptionStatus?: 'active' | 'expired' | 'canceled';
+  subscriptionExpiresAt?: Date | null;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -32,6 +34,8 @@ const UserSchema = new Schema<IUser>(
     subscriptionCurrency: { type: String, default: 'EUR' },
     subscriptionAmountCents: { type: Number, default: 0 },
     subscriptionLastPaidAt: { type: Date, default: null },
+    subscriptionStatus: { type: String, default: 'expired' },
+    subscriptionExpiresAt: { type: Date, default: null },
   },
   { collection: 'users' }
 );

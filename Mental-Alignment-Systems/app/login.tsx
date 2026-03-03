@@ -41,7 +41,7 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/welcome');
+      router.replace('/');
     }
   }, [isAuthenticated, router]);
 
@@ -63,7 +63,7 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await signInEmail(email.trim(), password);
-      router.replace('/welcome');
+      router.replace('/');
     } catch {
       setLocalError('Sign in failed. Check email and password.');
     } finally {
@@ -77,7 +77,7 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await promptGoogleSignIn();
-      router.replace('/welcome');
+      router.replace('/');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Google sign in failed';
       setLocalError(msg);
@@ -121,7 +121,14 @@ export default function LoginScreen() {
           <FadeInView duration={500}>
             <View style={styles.header}>
               <View style={styles.logoWrap}>
-                {!logoError ? (
+                {logoError ? (
+                  <View
+                    style={[
+                      styles.logoPlaceholder,
+                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
+                    ]}
+                  />
+                ) : (
                   <Image
                     source={require('../assets/images/geometry.jpeg')}
                     style={[
@@ -130,13 +137,6 @@ export default function LoginScreen() {
                     ]}
                     resizeMode="cover"
                     onError={() => setLogoError(true)}
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.logoPlaceholder,
-                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
-                    ]}
                   />
                 )}
               </View>

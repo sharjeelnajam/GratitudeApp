@@ -44,13 +44,23 @@ billingRouter.get('/subscription', authMiddleware, async (req: AuthRequest, res:
       return;
     }
 
+    const now = new Date();
+    const expiresAt = user.subscriptionExpiresAt ?? null;
+    const isActive =
+      !!expiresAt &&
+      expiresAt.getTime() > now.getTime() &&
+      (user.subscriptionStatus === 'active' || !user.subscriptionStatus);
+
     res.json({
       subscription: {
+        isActive,
+        status: user.subscriptionStatus ?? (isActive ? 'active' : 'expired'),
         isSubscriber: !!user.isSubscriber,
         planId: user.subscriptionPlan || null,
         currency: user.subscriptionCurrency || SUPPORTER_CURRENCY,
         amountCents: user.subscriptionAmountCents || 0,
         lastPaidAt: user.subscriptionLastPaidAt ?? null,
+        expiresAt,
       },
     });
   } catch (err) {
@@ -76,20 +86,28 @@ billingRouter.post(
       }
 
       const now = new Date();
+      const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
+      const expiresAt = new Date(now.getTime() + oneMonthMs);
+
       user.isSubscriber = true;
       user.subscriptionPlan = SUPPORTER_PLAN_ID;
       user.subscriptionCurrency = SUPPORTER_CURRENCY;
       user.subscriptionAmountCents = SUPPORTER_AMOUNT_CENTS;
       user.subscriptionLastPaidAt = now;
+      user.subscriptionStatus = 'active';
+      user.subscriptionExpiresAt = expiresAt;
       await user.save();
 
       res.json({
         subscription: {
+          isActive: true,
+          status: user.subscriptionStatus,
           isSubscriber: true,
           planId: user.subscriptionPlan,
           currency: user.subscriptionCurrency,
           amountCents: user.subscriptionAmountCents,
           lastPaidAt: user.subscriptionLastPaidAt,
+          expiresAt: user.subscriptionExpiresAt,
         },
       });
     } catch (err) {
