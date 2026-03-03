@@ -7,6 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth';
 import { roomsRouter } from './routes/rooms';
+import { billingRouter } from './routes/billing';
 import { authMiddleware } from './middleware/auth';
 
 const app = express();
@@ -33,6 +34,9 @@ app.get('/health', (_req, res) => {
 
 // Auth routes (sync-user requires Bearer token)
 app.use('/auth', authRouter);
+
+// Billing & subscription routes
+app.use('/billing', billingRouter);
 
 // Room HTTP API (protected)
 app.use('/rooms', authMiddleware, roomsRouter);

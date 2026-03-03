@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { AmbientBackground, Container, Text, FadeInView, Button, Card } from '@/shared/ui';
+import { AmbientBackground, Container, Text, FadeInView, Button, Card, CardEnterView } from '@/shared/ui';
 import { useTheme } from '@/theme';
 import { ContentCard } from '@/services/content';
 import { Participant } from '../types';
@@ -130,29 +130,30 @@ export function CardSelectionPhase({
                   contentContainerStyle={styles.cardsContent}
                 >
                   {shuffledCards.map((card, index) => (
-                    <Card
-                      key={card.id}
-                      variant="elevated"
-                      padding="md"
-                      style={[
-                        styles.card,
-                        selectedCard === card.id && styles.selectedCard,
-                      ]}
-                    >
-                      <Text variant="body" style={styles.cardText}>
-                        {card.content}
-                      </Text>
-                      {isYourTurn && !isShuffling && (
-                        <Button
-                          variant="subtle"
-                          size="sm"
-                          onPress={() => handleSelectCard(card.id)}
-                          style={styles.selectButton}
-                        >
-                          Select
-                        </Button>
-                      )}
-                    </Card>
+                    <CardEnterView key={card.id} staggerIndex={index}>
+                      <Card
+                        variant="elevated"
+                        padding="md"
+                        style={[
+                          styles.card,
+                          selectedCard === card.id && styles.selectedCard,
+                        ]}
+                      >
+                        <Text variant="body" style={styles.cardText}>
+                          {card.content}
+                        </Text>
+                        {isYourTurn && !isShuffling && (
+                          <Button
+                            variant="subtle"
+                            size="sm"
+                            onPress={() => handleSelectCard(card.id)}
+                            style={styles.selectButton}
+                          >
+                            Select
+                          </Button>
+                        )}
+                      </Card>
+                    </CardEnterView>
                   ))}
                 </ScrollView>
 

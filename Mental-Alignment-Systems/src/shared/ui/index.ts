@@ -26,6 +26,9 @@ export type { CardProps } from './Card';
 export { FadeInView } from './FadeInView';
 export type { FadeInViewProps } from './FadeInView';
 
+export { CardEnterView } from './CardEnterView';
+export type { CardEnterViewProps } from './CardEnterView';
+
 export { PulseView } from './PulseView';
 export type { PulseViewProps } from './PulseView';
 

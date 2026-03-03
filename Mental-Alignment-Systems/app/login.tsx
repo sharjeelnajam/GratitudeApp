@@ -36,18 +36,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [logoError, setLogoError] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/intro');
+      router.replace('/welcome');
     }
   }, [isAuthenticated, router]);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 600,
+      duration: 800,
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
@@ -62,7 +63,7 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await signInEmail(email.trim(), password);
-      router.replace('/intro');
+      router.replace('/welcome');
     } catch {
       setLocalError('Sign in failed. Check email and password.');
     } finally {
@@ -76,7 +77,7 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await promptGoogleSignIn();
-      router.replace('/intro');
+      router.replace('/welcome');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Google sign in failed';
       setLocalError(msg);
@@ -120,14 +121,24 @@ export default function LoginScreen() {
           <FadeInView duration={500}>
             <View style={styles.header}>
               <View style={styles.logoWrap}>
-                <Image
-                  source={require('../assets/images/geometry.jpeg')}
-                  style={[
-                    styles.logoImage,
-                    { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
-                  ]}
-                  resizeMode="cover"
-                />
+                {!logoError ? (
+                  <Image
+                    source={require('../assets/images/geometry.jpeg')}
+                    style={[
+                      styles.logoImage,
+                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
+                    ]}
+                    resizeMode="cover"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.logoPlaceholder,
+                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
+                    ]}
+                  />
+                )}
               </View>
               <Text style={styles.title}>Welcome back</Text>
               <Text style={styles.subtitle}>Sign in to continue your journey</Text>
@@ -252,6 +263,9 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     backgroundColor: 'transparent',
+  },
+  logoPlaceholder: {
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
   },
   title: {
     fontSize: 28,

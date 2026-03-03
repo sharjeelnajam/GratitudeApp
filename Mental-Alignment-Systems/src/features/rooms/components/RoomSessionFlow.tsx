@@ -11,8 +11,8 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RoomSessionState, RoomSession, ClosingChoice } from '../types';
-import { getRoomBackgroundVideoSource } from '../roomBackgroundVideo';
-import { LiveRoomVideoBackground } from './LiveRoomVideoBackground';
+import { FallingVideoBackground } from './FallingVideoBackground';
+import { LiveEffectVideoBackground } from './LiveEffectVideoBackground';
 import { BreathingActivityPhase } from './BreathingActivityPhase';
 import { BodyAwarenessPlayerPhase } from './BodyAwarenessPlayerPhase';
 import { RelaxationCardsPhase } from './RelaxationCardsPhase';
@@ -45,6 +45,7 @@ export function RoomSessionFlow({
   isChatOnline = true,
 }: RoomSessionFlowProps) {
   const insets = useSafeAreaInsets();
+  const [showFallingIntro, setShowFallingIntro] = useState(true);
   const [currentState, setCurrentState] = useState<RoomSessionState>(session.state);
   const [intention, setIntention] = useState<string>('');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -133,14 +134,11 @@ export function RoomSessionFlow({
     }, 1000);
   };
 
-  const videoSource = getRoomBackgroundVideoSource(session.roomType);
-
-  const wrapWithVideo = (phase: React.ReactNode) => (
+  const wrapWithLiveEffect = (phase: React.ReactNode) => (
     <View style={styles.wrapper}>
-      <LiveRoomVideoBackground source={videoSource}>
+      <LiveEffectVideoBackground>
         {phase}
-      </LiveRoomVideoBackground>
-      {/* Floating chat icon - visible on all room screens */}
+      </LiveEffectVideoBackground>
       <TouchableOpacity
         style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
         onPress={() => setChatModalVisible(true)}
@@ -159,25 +157,34 @@ export function RoomSessionFlow({
     </View>
   );
 
-  // Render current phase (all with live video background)
+  // After door opens: show starts-falling once, then switch to live-effect-1 for all phases
+  if (showFallingIntro) {
+    return (
+      <View style={styles.wrapper}>
+        <FallingVideoBackground loop={false} onPlaybackEnd={() => setShowFallingIntro(false)} />
+      </View>
+    );
+  }
+
+  // Render current phase with live-effect-1 background
   switch (currentState) {
     case 'breathing_activity':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <BreathingActivityPhase onComplete={handleBreathingActivityComplete} />
       );
 
     case 'body_awareness_audio':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />
       );
 
     case 'relaxation_cards':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />
       );
 
     case 'arrival':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <ArrivalPhase
           roomName={session.roomType.charAt(0).toUpperCase() + session.roomType.slice(1)}
           roomType={session.roomType}
@@ -186,7 +193,7 @@ export function RoomSessionFlow({
       );
 
     case 'reflection_questions':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <ReflectionQuestionsPhase
           roomType={session.roomType}
           onComplete={handleReflectionQuestionsComplete}
@@ -194,17 +201,17 @@ export function RoomSessionFlow({
       );
 
     case 'breathing':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <BreathingPhase onComplete={handleBreathingComplete} />
       );
 
     case 'intention_setting':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <IntentionSettingPhase onComplete={handleIntentionComplete} />
       );
 
     case 'card_selection':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <CardSelectionPhase
           cards={session.cards}
           participants={session.participants}
@@ -216,7 +223,7 @@ export function RoomSessionFlow({
       );
 
     case 'sharing':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <SharingPhase
           selectedCardContent={selectedCard?.content || ''}
           onShare={handleShare}
@@ -227,7 +234,7 @@ export function RoomSessionFlow({
       );
 
     case 'closing':
-      return wrapWithVideo(
+      return wrapWithLiveEffect(
         <ClosingPhase onChoice={handleClosingChoice} />
       );
 

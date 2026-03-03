@@ -6,7 +6,7 @@
  * Shown after Body Awareness audio.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-import { FadeInView } from '@/shared/ui';
+import { FadeInView, CardEnterView } from '@/shared/ui';
 
 const { width, height } = Dimensions.get('window');
 const CARD_GAP = 14;
@@ -30,7 +30,10 @@ const CARD_HEIGHT = Math.min(height * 0.55, 420);
 interface CardData {
   id: string;
   label: string;
+  /** Static image (PNG/JPG) - used when imageGif is not set */
   image: number;
+  /** Optional GIF (e.g. flower) - when set, used for the card front instead of image */
+  imageGif?: number;
   message: string;
 }
 
@@ -39,6 +42,7 @@ const CARDS: CardData[] = [
     id: '1',
     label: 'Lavender',
     image: require('../../../../assets/images/Purple.png'),
+    // imageGif: require('../../../../assets/images/lavender-flower.gif'), // optional: use GIF for animated flower
     message: 'You are allowed to rest. Soften your shoulders and breathe. This moment is yours.',
   },
   {
@@ -71,6 +75,8 @@ interface RelaxationCardsPhaseProps {
   onComplete: () => void;
 }
 
+const GLOW_CYCLE_MS = 2400;
+
 function FlipCard({
   card,
   index,
@@ -79,7 +85,25 @@ function FlipCard({
   index: number;
 }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
+  const glowAnim = useRef(new Animated.Value(0.08)).current;
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Gentle glow in/out on the card image (looping)
+  useEffect(() => {
+    const glowIn = Animated.timing(glowAnim, {
+      toValue: 0.32,
+      duration: GLOW_CYCLE_MS / 2,
+      useNativeDriver: true,
+    });
+    const glowOut = Animated.timing(glowAnim, {
+      toValue: 0.08,
+      duration: GLOW_CYCLE_MS / 2,
+      useNativeDriver: true,
+    });
+    const loop = Animated.loop(Animated.sequence([glowIn, glowOut]));
+    loop.start();
+    return () => loop.stop();
+  }, [glowAnim]);
 
   const handlePress = () => {
     const toValue = isFlipped ? 0 : 1;
@@ -109,6 +133,8 @@ function FlipCard({
     outputRange: [0, 0, 1],
   });
 
+  const cardImageSource = card.imageGif ?? card.image;
+
   return (
     <TouchableOpacity
       activeOpacity={1}
@@ -126,7 +152,16 @@ function FlipCard({
             },
           ]}
         >
-          <Image source={card.image} style={styles.cardImage} resizeMode="cover" />
+          <View style={styles.cardImageWrap}>
+            <Image source={cardImageSource} style={styles.cardImage} resizeMode="cover" />
+            <Animated.View
+              style={[
+                styles.cardImageGlow,
+                { opacity: glowAnim },
+              ]}
+              pointerEvents="none"
+            />
+          </View>
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.5)']}
             style={StyleSheet.absoluteFill}
@@ -161,13 +196,28 @@ function FlipCard({
 
 export function RelaxationCardsPhase({ onComplete }: RelaxationCardsPhaseProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
+  const [nextIndex, setNextIndex] = useState(0);
 
   const goPrev = () => {
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
+    if (isExiting) return;
+    const target = Math.max(0, currentIndex - 1);
+    if (target === currentIndex) return;
+    setNextIndex(target);
+    setIsExiting(true);
   };
 
   const goNext = () => {
-    setCurrentIndex((prev) => Math.min(CARDS.length - 1, prev + 1));
+    if (isExiting) return;
+    const target = Math.min(CARDS.length - 1, currentIndex + 1);
+    if (target === currentIndex) return;
+    setNextIndex(target);
+    setIsExiting(true);
+  };
+
+  const handleFlavourExitComplete = () => {
+    setCurrentIndex(nextIndex);
+    setIsExiting(false);
   };
 
   const isFirst = currentIndex === 0;
@@ -192,7 +242,14 @@ export function RelaxationCardsPhase({ onComplete }: RelaxationCardsPhaseProps) 
           <RNText style={styles.subtitle}>Tap the card to reveal a gentle reminder</RNText>
 
           <View style={styles.grid}>
-            <FlipCard key={currentCard.id} card={currentCard} index={currentIndex} />
+            <CardEnterView
+              key={currentCard.id}
+              exit={isExiting}
+              onExitComplete={isExiting ? handleFlavourExitComplete : undefined}
+              duration={400}
+            >
+              <FlipCard card={currentCard} index={currentIndex} />
+            </CardEnterView>
           </View>
 
           <View style={styles.carouselControls}>
@@ -298,10 +355,21 @@ const styles = StyleSheet.create({
   cardFront: {
     justifyContent: 'flex-end',
   },
-  cardImage: {
+  cardImageWrap: {
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  cardImageGlow: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
     borderRadius: 16,
   },
   cardLabelWrap: {

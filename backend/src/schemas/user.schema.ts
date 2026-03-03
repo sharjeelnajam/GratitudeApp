@@ -12,6 +12,11 @@ export interface IUser extends Document {
   photoURL: string;
   createdAt: Date;
   lastLogin: Date;
+  isSubscriber?: boolean;
+  subscriptionPlan?: string;
+  subscriptionCurrency?: string;
+  subscriptionAmountCents?: number;
+  subscriptionLastPaidAt?: Date | null;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -22,6 +27,11 @@ const UserSchema = new Schema<IUser>(
     photoURL: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now },
     lastLogin: { type: Date, default: Date.now },
+    isSubscriber: { type: Boolean, default: false },
+    subscriptionPlan: { type: String, default: '' },
+    subscriptionCurrency: { type: String, default: 'EUR' },
+    subscriptionAmountCents: { type: Number, default: 0 },
+    subscriptionLastPaidAt: { type: Date, default: null },
   },
   { collection: 'users' }
 );

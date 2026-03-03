@@ -3,7 +3,7 @@
  *
  * Shows rotating logo when entering a specific room, then navigates to that room.
  * Used when user taps "Enter" on a room card.
- * Uses the same live video background as rooms (parallax by room type).
+ * Background: door-opening-room.mp4 (play once, holds last frame; replays on each enter).
  */
 
 import { View, StyleSheet, Image, Dimensions, Animated } from 'react-native';
@@ -11,8 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { LiveRoomVideoBackground } from '@/features/rooms/components/LiveRoomVideoBackground';
-import { getRoomBackgroundVideoSource } from '@/features/rooms/roomBackgroundVideo';
+import { DoorOpeningVideoBackground } from '@/features/rooms/components/DoorOpeningVideoBackground';
 
 const { width } = Dimensions.get('window');
 
@@ -66,14 +65,9 @@ export default function EnteringRoomScreen() {
     outputRange: ['0deg', '360deg'],
   });
 
-  const roomType = room && VALID_ROOMS.includes(room as (typeof VALID_ROOMS)[number])
-    ? (room as 'fireplace' | 'ocean' | 'forest' | 'nightSky')
-    : 'fireplace';
-  const videoSource = getRoomBackgroundVideoSource(roomType);
-
   return (
     <View style={styles.container}>
-      <LiveRoomVideoBackground source={videoSource}>
+      <DoorOpeningVideoBackground>
         <LinearGradient
           colors={['rgba(30,27,46,0.82)', 'rgba(45,27,61,0.82)', 'rgba(59,47,77,0.82)']}
           start={{ x: 0, y: 0 }}
@@ -101,7 +95,7 @@ export default function EnteringRoomScreen() {
         </Animated.View>
         <Text style={styles.subtitle}>Entering your space...</Text>
         </View>
-      </LiveRoomVideoBackground>
+      </DoorOpeningVideoBackground>
     </View>
   );
 }

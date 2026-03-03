@@ -13,19 +13,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
-  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, FadeInView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
 const CARD_PADDING_H = 20;
-const CARD_MAX_WIDTH = Math.min(width - CARD_PADDING_H * 2, 380);
+const BOTTOM_GAP = 12;
 const BOTTOM_BAR_HEIGHT = 72;
 const HEADER_HEIGHT = 100;
+const CARD_MAX_WIDTH = Math.min(width - CARD_PADDING_H * 2, 380);
+/** Each bottom button gets exactly half the row so both stay visible on all screens */
+const BOTTOM_BUTTON_WIDTH = Math.floor((width - CARD_PADDING_H * 2 - BOTTOM_GAP) / 2);
 
 const REFLECTION_QUESTIONS = [
   { id: '1', prompt: 'I feel', placeholder: '…' },
@@ -45,8 +47,6 @@ export default function QuestionsScreen() {
   const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const cardOpacity = useRef(new Animated.Value(1)).current;
-  const cardScale = useRef(new Animated.Value(1)).current;
 
   // Clamp index to valid range so hot reload or edge cases never break rendering
   const safeIndex = Math.min(Math.max(currentIndex, 0), TOTAL - 1);
@@ -58,41 +58,18 @@ export default function QuestionsScreen() {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
-  const animateOut = (direction: 'next' | 'prev') => {
-    Animated.parallel([
-      Animated.timing(cardOpacity, {
-        toValue: 0,
-        duration: 160,
-        useNativeDriver: true,
-      }),
-      Animated.timing(cardScale, {
-        toValue: direction === 'next' ? 0.96 : 1.04,
-        duration: 160,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      const nextIndex = direction === 'next'
-        ? Math.min(currentIndex + 1, TOTAL - 1)
-        : Math.max(currentIndex - 1, 0);
-      setCurrentIndex(nextIndex);
-      // Reset opacity after React renders new content (fixes second question not showing on first open)
-      setTimeout(() => {
-        cardOpacity.setValue(1);
-        cardScale.setValue(1);
-      }, 0);
-    });
-  };
-
   const handleNext = () => {
     if (isLast) {
       router.push('/rooms');
       return;
     }
-    animateOut('next');
+    setCurrentIndex((i) => Math.min(i + 1, TOTAL - 1));
   };
 
   const handleBack = () => {
-    if (!isFirst) animateOut('prev');
+    if (!isFirst) {
+      setCurrentIndex((i) => Math.max(i - 1, 0));
+    }
   };
 
   return (
@@ -133,15 +110,7 @@ export default function QuestionsScreen() {
           </FadeInView>
 
           {/* Middle: single question card */}
-          <Animated.View
-            style={[
-              styles.cardWrapper,
-              {
-                opacity: cardOpacity,
-                transform: [{ scale: cardScale }],
-              },
-            ]}
-          >
+          <View style={styles.cardWrapper}>
             <View style={styles.questionCard}>
               <View style={styles.cardAccent} />
               <View style={styles.cardInner}>
@@ -160,28 +129,36 @@ export default function QuestionsScreen() {
                 />
               </View>
             </View>
-          </Animated.View>
+          </View>
 
-          {/* Bottom: button bar with safe area */}
+          {/* Bottom: Back + Next / Enter Rooms – fixed widths so both always visible */}
           <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 24) }]}>
             {isFirst ? (
-              <View style={styles.backPlaceholder} />
+              <View style={[styles.backPlaceholder, { width: BOTTOM_BUTTON_WIDTH }]} />
             ) : (
               <TouchableOpacity
                 onPress={handleBack}
                 activeOpacity={0.7}
-                style={styles.backButton}
+                style={[styles.backButton, { width: BOTTOM_BUTTON_WIDTH }]}
               >
                 <Text style={styles.backButtonText}>Back</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
               onPress={handleNext}
-              activeOpacity={0.7}
-              style={styles.nextButton}
+              activeOpacity={0.85}
+              style={[
+                styles.nextButton,
+                { width: BOTTOM_BUTTON_WIDTH },
+                isLast && styles.enterRoomsButton,
+              ]}
             >
-              <Text style={styles.nextButtonText}>
-                {isLast ? 'Continue to Rooms' : 'Next'}
+              <Text
+                style={[styles.nextButtonText, isLast && styles.enterRoomsButtonText]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {isLast ? 'Enter Rooms' : 'Next'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -257,101 +234,122 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '100%',
     maxWidth: CARD_MAX_WIDTH,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    padding: 28,
     paddingBottom: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(45, 35, 65, 0.92)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: 'rgba(167, 139, 250, 0.35)',
+    overflow: 'hidden',
+    shadowColor: '#A78BFA',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 12,
   },
   cardAccent: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 3,
-    backgroundColor: 'rgba(167, 139, 250, 0.85)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    height: 2,
+    backgroundColor: 'rgba(167, 139, 250, 0.6)',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
   cardInner: {
-    marginTop: 8,
+    marginTop: 4,
   },
   promptLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(167, 139, 250, 0.95)',
-    letterSpacing: 1.2,
-    marginBottom: 10,
+    color: 'rgba(196, 181, 253, 0.95)',
+    letterSpacing: 1,
+    marginBottom: 8,
     textTransform: 'uppercase',
   },
   promptText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.98)',
+    color: '#FFFFFF',
     fontFamily: 'serif',
-    lineHeight: 28,
-    marginBottom: 16,
+    lineHeight: 30,
+    marginBottom: 18,
   },
   input: {
-    fontSize: 17,
-    fontWeight: '300',
+    fontSize: 16,
+    fontWeight: '400',
     color: '#FFFFFF',
     paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: 'rgba(30, 27, 46, 0.6)',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.25)',
+    borderColor: 'rgba(167, 139, 250, 0.3)',
     minHeight: 52,
   },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: BOTTOM_GAP,
     minHeight: BOTTOM_BAR_HEIGHT,
     paddingTop: 20,
+    flexShrink: 0,
   },
   backPlaceholder: {
-    flex: 1,
-    minWidth: 0,
+    minHeight: 52,
   },
   backButton: {
-    flex: 1,
-    minWidth: 0,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    minHeight: 52,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    minHeight: 48,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   backButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.95)',
   },
   nextButton: {
-    flex: 1,
-    minWidth: 0,
-    borderRadius: 10,
+    minHeight: 52,
+    borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.55)',
-    backgroundColor: 'rgba(139, 92, 246, 0.22)',
-    minHeight: 48,
+    borderColor: 'rgba(139, 92, 246, 0.6)',
+    backgroundColor: 'rgba(139, 92, 246, 0.28)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
   },
   nextButtonText: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600',
     letterSpacing: 0.5,
+  },
+  enterRoomsButton: {
+    minHeight: 54,
+    borderRadius: 14,
+    backgroundColor: 'rgba(139, 92, 246, 0.95)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(167, 139, 250, 0.6)',
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    elevation: 4,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.45,
+    shadowRadius: 6,
+  },
+  enterRoomsButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.6,
   },
 });
