@@ -13,6 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { RoomSessionState, RoomSession, ClosingChoice } from '../types';
 import { FallingVideoBackground } from './FallingVideoBackground';
 import { LiveEffectVideoBackground } from './LiveEffectVideoBackground';
+import { FireRoomParallaxBackground } from './FireRoomParallaxBackground';
 import { BreathingActivityPhase } from './BreathingActivityPhase';
 import { BodyAwarenessPlayerPhase } from './BodyAwarenessPlayerPhase';
 import { RelaxationCardsPhase } from './RelaxationCardsPhase';
@@ -134,28 +135,39 @@ export function RoomSessionFlow({
     }, 1000);
   };
 
-  const wrapWithLiveEffect = (phase: React.ReactNode) => (
-    <View style={styles.wrapper}>
-      <LiveEffectVideoBackground>
-        {phase}
-      </LiveEffectVideoBackground>
-      <TouchableOpacity
-        style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
-        onPress={() => setChatModalVisible(true)}
-        activeOpacity={0.7}
-      >
-        <MaterialIcons name="chat-bubble-outline" size={26} color="#FFFFFF" />
-      </TouchableOpacity>
-      <ChatModal
-        visible={chatModalVisible}
-        onClose={() => setChatModalVisible(false)}
-        messages={chatMessages}
-        onSend={handleChatSend}
-        participantCount={participantCount}
-        isOnline={isChatOnline}
-      />
-    </View>
-  );
+  const wrapWithBackground = (phase: React.ReactNode) => {
+    const background =
+      session.roomType === 'fireplace' ? (
+        <FireRoomParallaxBackground>
+          {phase}
+        </FireRoomParallaxBackground>
+      ) : (
+        <LiveEffectVideoBackground>
+          {phase}
+        </LiveEffectVideoBackground>
+      );
+
+    return (
+      <View style={styles.wrapper}>
+        {background}
+        <TouchableOpacity
+          style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
+          onPress={() => setChatModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="chat-bubble-outline" size={26} color="#FFFFFF" />
+        </TouchableOpacity>
+        <ChatModal
+          visible={chatModalVisible}
+          onClose={() => setChatModalVisible(false)}
+          messages={chatMessages}
+          onSend={handleChatSend}
+          participantCount={participantCount}
+          isOnline={isChatOnline}
+        />
+      </View>
+    );
+  };
 
   // After door opens: show starts-falling once, then switch to live-effect-1 for all phases
   if (showFallingIntro) {
@@ -169,22 +181,22 @@ export function RoomSessionFlow({
   // Render current phase with live-effect-1 background
   switch (currentState) {
     case 'breathing_activity':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <BreathingActivityPhase onComplete={handleBreathingActivityComplete} />
       );
 
     case 'body_awareness_audio':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />
       );
 
     case 'relaxation_cards':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />
       );
 
     case 'arrival':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <ArrivalPhase
           roomName={session.roomType.charAt(0).toUpperCase() + session.roomType.slice(1)}
           roomType={session.roomType}
@@ -193,7 +205,7 @@ export function RoomSessionFlow({
       );
 
     case 'reflection_questions':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <ReflectionQuestionsPhase
           roomType={session.roomType}
           onComplete={handleReflectionQuestionsComplete}
@@ -201,17 +213,17 @@ export function RoomSessionFlow({
       );
 
     case 'breathing':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <BreathingPhase onComplete={handleBreathingComplete} />
       );
 
     case 'intention_setting':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <IntentionSettingPhase onComplete={handleIntentionComplete} />
       );
 
     case 'card_selection':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <CardSelectionPhase
           cards={session.cards}
           participants={session.participants}
@@ -223,7 +235,7 @@ export function RoomSessionFlow({
       );
 
     case 'sharing':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <SharingPhase
           selectedCardContent={selectedCard?.content || ''}
           onShare={handleShare}
@@ -234,7 +246,7 @@ export function RoomSessionFlow({
       );
 
     case 'closing':
-      return wrapWithLiveEffect(
+      return wrapWithBackground(
         <ClosingPhase onChoice={handleClosingChoice} />
       );
 
