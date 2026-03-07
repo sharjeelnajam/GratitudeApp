@@ -13,7 +13,7 @@ export interface ContainerProps {
   children: ReactNode;
   style?: ViewStyle;
   padding?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  backgroundColor?: 'background' | 'surface' | 'surfaceElevated';
+  backgroundColor?: 'background' | 'surface' | 'surfaceElevated' | 'transparent';
 }
 
 export function Container({
@@ -25,7 +25,7 @@ export function Container({
   const { theme } = useTheme();
 
   const containerStyle: ViewStyle = {
-    backgroundColor: theme.colors[backgroundColor],
+    backgroundColor: backgroundColor === 'transparent' ? 'transparent' : theme.colors[backgroundColor],
     padding: theme.spacingSemantic[padding],
   };
 

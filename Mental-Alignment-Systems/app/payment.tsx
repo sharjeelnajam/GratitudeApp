@@ -13,6 +13,7 @@ import { SvgXml } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text } from '@/shared/ui';
 import { activateSubscription } from '@/services/billing/billingService';
+import { SHOW_PAYMENT_ALWAYS } from '@/features/payments/config';
 
 const { width } = Dimensions.get('window');
 const CARD_MAX_WIDTH = Math.min(width - 48, 420);
@@ -35,6 +36,13 @@ export default function PaymentScreen() {
   const startCheckout = async (provider: Provider) => {
     if (loadingProvider) return;
     setError(null);
+
+    // Demo / client preview mode — skip payment processing, go to login
+    if (SHOW_PAYMENT_ALWAYS) {
+      router.replace('/login');
+      return;
+    }
+
     setLoadingProvider(provider);
     try {
       const subscription = await activateSubscription(provider);

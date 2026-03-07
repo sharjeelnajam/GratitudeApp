@@ -33,7 +33,7 @@ export function ReflectionQuestionsPhase({ roomType, onComplete }: ReflectionQue
 
   return (
     <AmbientBackground variant="solid" roomTheme>
-      <Container style={styles.container} padding="lg" backgroundColor="background">
+      <Container style={styles.container} padding="lg" backgroundColor="transparent">
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}

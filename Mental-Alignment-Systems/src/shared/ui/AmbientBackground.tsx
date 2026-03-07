@@ -33,9 +33,8 @@ export function AmbientBackground({
   // Get background color based on variant and room theme
   const getBackgroundColor = (): string => {
     if (roomTheme) {
-      // Room theme colors would come from roomThemes
-      // For now, use accent color as a subtle hint
-      return theme.colors.background;
+      // Semi-transparent neutral overlay so the room background image shows through
+      return 'rgba(0, 0, 0, 0.30)';
     }
 
     switch (variant) {

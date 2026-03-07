@@ -50,7 +50,7 @@ export function ArrivalPhase({ roomName, roomType, onComplete }: ArrivalPhasePro
 
   return (
     <AmbientBackground variant="solid" roomTheme>
-      <Container style={styles.container} padding="lg" backgroundColor="background">
+      <Container style={styles.container} padding="lg" backgroundColor="transparent">
         <FadeInView duration={theme.motion.animations.fadeIn.duration} delay={300}>
           <View style={styles.content}>
             <Text variant="h2" style={styles.title}>

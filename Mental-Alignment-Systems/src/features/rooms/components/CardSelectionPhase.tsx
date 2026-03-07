@@ -82,7 +82,7 @@ export function CardSelectionPhase({
 
   return (
     <AmbientBackground variant="solid" roomTheme>
-      <Container style={styles.container} padding="lg" backgroundColor="background">
+      <Container style={styles.container} padding="lg" backgroundColor="transparent">
         <FadeInView duration={theme.motion.animations.fadeIn.duration}>
           <View style={styles.content}>
             <Text variant="h3" style={styles.title}>

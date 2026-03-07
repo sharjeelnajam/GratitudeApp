@@ -72,7 +72,7 @@ export function BreathingPhase({ duration = 60, onComplete }: BreathingPhaseProp
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['rgba(30,27,46,0.82)', 'rgba(45,27,61,0.82)', 'rgba(59,47,77,0.82)']}
+        colors={['rgba(0,0,0,0.40)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.40)']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
