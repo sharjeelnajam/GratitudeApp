@@ -68,6 +68,10 @@ export default function RootLayout() {
               name="signup"
               options={{ contentStyle: { backgroundColor: '#0A0714' } }}
             />
+            <Stack.Screen
+              name="forgot-password"
+              options={{ contentStyle: { backgroundColor: '#0A0714' } }}
+            />
             <Stack.Screen name="welcome" />
             <Stack.Screen name="intro" />
             <Stack.Screen

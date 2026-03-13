@@ -6,7 +6,7 @@
  * Chat icon (bottom right) on all screens; tap to open chat modal.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -135,40 +135,6 @@ export function RoomSessionFlow({
     }, 1000);
   };
 
-  const wrapWithBackground = (phase: React.ReactNode) => {
-    const background =
-      session.roomType === 'fireplace' ? (
-        <FireRoomParallaxBackground>
-          {phase}
-        </FireRoomParallaxBackground>
-      ) : (
-        <LiveEffectVideoBackground>
-          {phase}
-        </LiveEffectVideoBackground>
-      );
-
-    return (
-      <View style={styles.wrapper}>
-        {background}
-        <TouchableOpacity
-          style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
-          onPress={() => setChatModalVisible(true)}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="chat-bubble-outline" size={26} color="#FFFFFF" />
-        </TouchableOpacity>
-        <ChatModal
-          visible={chatModalVisible}
-          onClose={() => setChatModalVisible(false)}
-          messages={chatMessages}
-          onSend={handleChatSend}
-          participantCount={participantCount}
-          isOnline={isChatOnline}
-        />
-      </View>
-    );
-  };
-
   // After door opens: show starts-falling once, then switch to live-effect-1 for all phases
   if (showFallingIntro) {
     return (
@@ -178,81 +144,101 @@ export function RoomSessionFlow({
     );
   }
 
-  // Render current phase with live-effect-1 background
-  switch (currentState) {
-    case 'breathing_activity':
-      return wrapWithBackground(
-        <BreathingActivityPhase onComplete={handleBreathingActivityComplete} />
-      );
+  // Resolve the current phase content (no background here — background mounts once below)
+  const currentPhase = (() => {
+    switch (currentState) {
+      case 'breathing_activity':
+        return <BreathingActivityPhase onComplete={handleBreathingActivityComplete} />;
 
-    case 'body_awareness_audio':
-      return wrapWithBackground(
-        <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />
-      );
+      case 'body_awareness_audio':
+        return <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />;
 
-    case 'relaxation_cards':
-      return wrapWithBackground(
-        <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />
-      );
+      case 'relaxation_cards':
+        return <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />;
 
-    case 'arrival':
-      return wrapWithBackground(
-        <ArrivalPhase
-          roomName={session.roomType.charAt(0).toUpperCase() + session.roomType.slice(1)}
-          roomType={session.roomType}
-          onComplete={handleArrivalComplete}
-        />
-      );
+      case 'arrival':
+        return (
+          <ArrivalPhase
+            roomName={session.roomType.charAt(0).toUpperCase() + session.roomType.slice(1)}
+            roomType={session.roomType}
+            onComplete={handleArrivalComplete}
+          />
+        );
 
-    case 'reflection_questions':
-      return wrapWithBackground(
-        <ReflectionQuestionsPhase
-          roomType={session.roomType}
-          onComplete={handleReflectionQuestionsComplete}
-        />
-      );
+      case 'reflection_questions':
+        return (
+          <ReflectionQuestionsPhase
+            roomType={session.roomType}
+            onComplete={handleReflectionQuestionsComplete}
+          />
+        );
 
-    case 'breathing':
-      return wrapWithBackground(
-        <BreathingPhase onComplete={handleBreathingComplete} />
-      );
+      case 'breathing':
+        return <BreathingPhase onComplete={handleBreathingComplete} />;
 
-    case 'intention_setting':
-      return wrapWithBackground(
-        <IntentionSettingPhase onComplete={handleIntentionComplete} />
-      );
+      case 'intention_setting':
+        return <IntentionSettingPhase onComplete={handleIntentionComplete} />;
 
-    case 'card_selection':
-      return wrapWithBackground(
-        <CardSelectionPhase
-          cards={session.cards}
-          participants={session.participants}
-          currentShufflerIndex={session.currentShufflerIndex}
-          onShuffle={() => {}}
-          onCardSelect={handleCardSelect}
-          onComplete={handleCardSelectionComplete}
-        />
-      );
+      case 'card_selection':
+        return (
+          <CardSelectionPhase
+            cards={session.cards}
+            participants={session.participants}
+            currentShufflerIndex={session.currentShufflerIndex}
+            onShuffle={() => {}}
+            onCardSelect={handleCardSelect}
+            onComplete={handleCardSelectionComplete}
+          />
+        );
 
-    case 'sharing':
-      return wrapWithBackground(
-        <SharingPhase
-          selectedCardContent={selectedCard?.content || ''}
-          onShare={handleShare}
-          onSkip={handleSharingComplete}
-          onComplete={handleSharingComplete}
-          existingShares={shares}
-        />
-      );
+      case 'sharing':
+        return (
+          <SharingPhase
+            selectedCardContent={selectedCard?.content || ''}
+            onShare={handleShare}
+            onSkip={handleSharingComplete}
+            onComplete={handleSharingComplete}
+            existingShares={shares}
+          />
+        );
 
-    case 'closing':
-      return wrapWithBackground(
-        <ClosingPhase onChoice={handleClosingChoice} />
-      );
+      case 'closing':
+        return <ClosingPhase onChoice={handleClosingChoice} />;
 
-    default:
-      return null;
-  }
+      default:
+        return null;
+    }
+  })();
+
+  // Background mounts ONCE for the entire session so gyro/yaw state persists across phase transitions.
+  return (
+    <View style={styles.wrapper}>
+      {session.roomType === 'fireplace' ? (
+        <FireRoomParallaxBackground>
+          {currentPhase}
+        </FireRoomParallaxBackground>
+      ) : (
+        <LiveEffectVideoBackground>
+          {currentPhase}
+        </LiveEffectVideoBackground>
+      )}
+      <TouchableOpacity
+        style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
+        onPress={() => setChatModalVisible(true)}
+        activeOpacity={0.7}
+      >
+        <MaterialIcons name="chat-bubble-outline" size={26} color="#FFFFFF" />
+      </TouchableOpacity>
+      <ChatModal
+        visible={chatModalVisible}
+        onClose={() => setChatModalVisible(false)}
+        messages={chatMessages}
+        onSend={handleChatSend}
+        participantCount={participantCount}
+        isOnline={isChatOnline}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

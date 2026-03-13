@@ -12,6 +12,7 @@ import {
   signInWithGoogle,
   signOut as authSignOut,
   syncUserToBackend,
+  sendPasswordReset,
   type AuthUser,
 } from '@/services/auth';
 
@@ -96,6 +97,20 @@ export function useAuth() {
     setUser(null);
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    setError(null);
+    if (__DEV__) console.log('[useAuth] resetPassword called for:', email);
+    try {
+      await sendPasswordReset(email);
+      if (__DEV__) console.log('[useAuth] resetPassword succeeded');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Password reset failed';
+      if (__DEV__) console.error('[useAuth] resetPassword error:', msg);
+      setError(msg);
+      throw e;
+    }
+  }, []);
+
   return {
     user,
     firebaseUser,
@@ -106,5 +121,6 @@ export function useAuth() {
     signUpEmail,
     signInWithGoogle: signInWithGoogleCred,
     signOut,
+    resetPassword,
   };
 }

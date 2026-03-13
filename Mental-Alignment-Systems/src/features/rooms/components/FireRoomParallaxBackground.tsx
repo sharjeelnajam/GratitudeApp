@@ -28,12 +28,12 @@ const PANORAMA_WIDTH = PANORAMA_HEIGHT * PANORAMA_ASPECT;
 const VERTICAL_PADDING = 80;
 
 const SENSOR_INTERVAL_MS = 25; // ~40 Hz is enough when smoothed
-const SMOOTHING = 0.11; // lerp: lower = smoother, slower (0.08–0.15)
-const GYRO_YAW_FACTOR = 0.7; // scale down so 360° rotation = one full device turn
-const GYRO_PITCH_FACTOR = 0.6;
+const SMOOTHING = 0.13; // lerp: lower = smoother, slower (0.08–0.15)
+const GYRO_YAW_FACTOR = 1.0; // scale down so 360° rotation = one full device turn
+const GYRO_PITCH_FACTOR = 0.85;
 const PITCH_CLAMP_RAD = Math.PI / 2 - 0.5;
 const PITCH_TO_PX = 60;
-const ACCEL_TILT_SENSITIVITY = 70;
+const ACCEL_TILT_SENSITIVITY = 90;
 
 const FIRE_ROOM_IMAGE = require('../../../../assets/images/fireroom.png');
 
@@ -67,7 +67,7 @@ export function FireRoomParallaxBackground({ children }: FireRoomParallaxBackgro
       const dt = lastTime.current > 0 ? Math.min(now - lastTime.current, 0.1) : 0;
       lastTime.current = now;
 
-      yaw.current += data.y * dt * GYRO_YAW_FACTOR;
+      yaw.current -= data.y * dt * GYRO_YAW_FACTOR;
       pitch.current += data.x * dt * GYRO_PITCH_FACTOR;
       pitch.current = clamp(pitch.current, -PITCH_CLAMP_RAD, PITCH_CLAMP_RAD);
 
@@ -91,7 +91,7 @@ export function FireRoomParallaxBackground({ children }: FireRoomParallaxBackgro
 
   const updateFromAccelerometer = useCallback(
     (data: { x: number; y: number; z: number }) => {
-      const targetX = centerTranslateX - data.y * ACCEL_TILT_SENSITIVITY;
+      const targetX = centerTranslateX + data.y * ACCEL_TILT_SENSITIVITY;
       const targetY = data.x * ACCEL_TILT_SENSITIVITY;
       smoothX.current += (clamp(targetX, minTranslateX, 0) - smoothX.current) * SMOOTHING;
       smoothY.current += (clamp(targetY, -120, 120) - smoothY.current) * SMOOTHING;

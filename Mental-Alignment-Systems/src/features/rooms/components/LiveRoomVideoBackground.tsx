@@ -21,14 +21,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { ReactNode } from 'react';
 
-const SENSOR_INTERVAL_MS = 66; // ~15 Hz to limit JS work
-const SMOOTHING = 0.12; // lerp factor: lower = smoother, slower response
-const SENSITIVITY = 8; // scale raw gyro to pixels
+const SENSOR_INTERVAL_MS = 33; // ~30 Hz — snappier without being jittery
+const SMOOTHING = 0.15; // lerp factor: lower = smoother, slower response
+const SENSITIVITY = 20; // scale raw gyro to pixels
 
 export interface LiveRoomVideoBackgroundProps {
   /** Video source: require() of .mp4 or URI string */
   source: number | string;
-  /** Max parallax offset in px (default 15). Clamped to ±maxOffset. */
+  /** Max parallax offset in px (default 22). Clamped to ±maxOffset. */
   maxOffset?: number;
   /** Content rendered on top of the video (e.g. room UI). */
   children?: ReactNode;
@@ -40,7 +40,7 @@ function clamp(value: number, min: number, max: number): number {
 
 export function LiveRoomVideoBackground({
   source,
-  maxOffset = 15,
+  maxOffset = 22,
   children,
 }: LiveRoomVideoBackgroundProps) {
   const player = useVideoPlayer(source, (p) => {

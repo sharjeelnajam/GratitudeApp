@@ -11,9 +11,12 @@ import {
   User as FirebaseUser,
   signOut as firebaseSignOut,
   updateProfile,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth } from './firebaseConfig';
 import { API_URL } from '@/config/api';
+
+export { auth } from './firebaseConfig';
 
 // Debug: log API URL on first use (check in Metro terminal)
 if (__DEV__) {
@@ -99,4 +102,23 @@ export async function signOut(): Promise<void> {
 
 export function getCurrentFirebaseUser(): FirebaseUser | null {
   return auth.currentUser;
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  if (__DEV__) {
+    console.log('[Auth] sendPasswordReset called for:', email);
+    console.log('[Auth] auth instance exists:', !!auth);
+    console.log('[Auth] auth config:', auth?.config);
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    if (__DEV__) {
+      console.log('[Auth] sendPasswordResetEmail completed — email should be sent');
+    }
+  } catch (e) {
+    if (__DEV__) {
+      console.error('[Auth] sendPasswordResetEmail FAILED:', e);
+    }
+    throw e;
+  }
 }

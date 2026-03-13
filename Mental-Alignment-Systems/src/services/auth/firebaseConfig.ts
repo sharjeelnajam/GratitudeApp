@@ -1,11 +1,16 @@
 /**
  * Firebase Configuration (native: iOS, Android)
- * Uses getAuth - auth state uses in-memory persistence by default.
- * For persistent auth across app restarts, use @react-native-firebase/auth instead.
+ * Uses initializeAuth with AsyncStorage so auth state persists across app restarts.
  */
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import {
+  initializeAuth,
+  getAuth,
+  getReactNativePersistence,
+  Auth,
+} from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY ?? '',
@@ -24,5 +29,16 @@ if (getApps().length === 0) {
   app = getApp();
 }
 
-export const auth = getAuth(app);
+function createAuth(firebaseApp: FirebaseApp): Auth {
+  try {
+    return initializeAuth(firebaseApp, {
+      persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+    });
+  } catch {
+    // If auth was already initialized (e.g. hot reload), fall back to getAuth
+    return getAuth(firebaseApp);
+  }
+}
+
+export const auth = createAuth(app);
 export { app };
