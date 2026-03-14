@@ -28,12 +28,12 @@ const PANORAMA_WIDTH = PANORAMA_HEIGHT * PANORAMA_ASPECT;
 const VERTICAL_PADDING = 80;
 
 const SENSOR_INTERVAL_MS = 25; // ~40 Hz is enough when smoothed
-const SMOOTHING = 0.13; // lerp: lower = smoother, slower (0.08–0.15)
-const GYRO_YAW_FACTOR = 1.0; // scale down so 360° rotation = one full device turn
-const GYRO_PITCH_FACTOR = 0.85;
+const SMOOTHING = 0.22; // lerp: lower = smoother, slower (0.08–0.30)
+const GYRO_YAW_FACTOR = 1.8; // horizontal rotation speed
+const GYRO_PITCH_FACTOR = 1.4; // vertical rotation speed
 const PITCH_CLAMP_RAD = Math.PI / 2 - 0.5;
-const PITCH_TO_PX = 60;
-const ACCEL_TILT_SENSITIVITY = 90;
+const PITCH_TO_PX = 90;
+const ACCEL_TILT_SENSITIVITY = 150;
 
 const FIRE_ROOM_IMAGE = require('../../../../assets/images/fireroom.png');
 

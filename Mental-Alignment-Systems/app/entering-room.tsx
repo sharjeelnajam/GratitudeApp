@@ -10,13 +10,12 @@ import { View, StyleSheet, Image, Dimensions, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { DoorOpeningVideoBackground } from '@/features/rooms/components/DoorOpeningVideoBackground';
 
 const { width } = Dimensions.get('window');
 
 const LOGO_SIZE = Math.min(width * 0.55, 220);
-const TRANSITION_DURATION_MS = 2800;
 
 const VALID_ROOMS = ['fireplace', 'ocean', 'forest', 'nightSky'] as const;
 
@@ -46,18 +45,24 @@ export default function EnteringRoomScreen() {
     return () => rotation.stop();
   }, [logoRotation]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const roomType = room && VALID_ROOMS.includes(room as (typeof VALID_ROOMS)[number])
-        ? room
-        : null;
+  const navigatedRef = useRef(false);
+
+  const handleDoorFullyOpen = useCallback(() => {
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+
+    const roomType = room && VALID_ROOMS.includes(room as (typeof VALID_ROOMS)[number])
+      ? room
+      : null;
+
+    // Small delay after door is fully open so the user sees it
+    setTimeout(() => {
       if (roomType) {
         router.replace(`/rooms/${roomType}`);
       } else {
         router.replace('/rooms');
       }
-    }, TRANSITION_DURATION_MS);
-    return () => clearTimeout(timer);
+    }, 600);
   }, [router, room]);
 
   const rotateInterpolate = logoRotation.interpolate({
@@ -67,7 +72,7 @@ export default function EnteringRoomScreen() {
 
   return (
     <View style={styles.container}>
-      <DoorOpeningVideoBackground>
+      <DoorOpeningVideoBackground onDoorFullyOpen={handleDoorFullyOpen}>
         <LinearGradient
           colors={['rgba(30,27,46,0.82)', 'rgba(45,27,61,0.82)', 'rgba(59,47,77,0.82)']}
           start={{ x: 0, y: 0 }}

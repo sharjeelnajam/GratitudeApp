@@ -31,12 +31,17 @@ export interface DoorOpeningVideoBackgroundProps {
    * When set, do not play — show this frame only and pause (e.g. inside room so door does not replay).
    */
   readonly initialPausedAtTime?: number;
+  /**
+   * Fired once when the door has fully opened (video reached stopAtTimeSeconds).
+   */
+  readonly onDoorFullyOpen?: () => void;
 }
 
 export function DoorOpeningVideoBackground({
   children,
   stopAtTimeSeconds = DOOR_OPEN_FRAME_TIME_SECONDS,
   initialPausedAtTime,
+  onDoorFullyOpen,
 }: DoorOpeningVideoBackgroundProps) {
   const hasStoppedRef = useRef(false);
 
@@ -81,13 +86,14 @@ export function DoorOpeningVideoBackground({
           hasStoppedRef.current = true;
           player.currentTime = stopAtTimeSeconds;
           player.pause();
+          onDoorFullyOpen?.();
         }
       };
 
       const sub = player.addListener('timeUpdate', onTimeUpdate);
       return () => sub.remove();
     }
-  }, [player, stopAtTimeSeconds, initialPausedAtTime]);
+  }, [player, stopAtTimeSeconds, initialPausedAtTime, onDoorFullyOpen]);
 
   return (
     <View style={styles.container}>
