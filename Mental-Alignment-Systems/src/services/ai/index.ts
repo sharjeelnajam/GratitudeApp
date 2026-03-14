@@ -47,3 +47,6 @@ export {
   needsGuardrailFiltering,
 } from './guardrails';
 export type { GuardrailResult } from './guardrails';
+
+// Companion Service
+export { sendCompanionMessage, clearCompanionHistory } from './companionService';

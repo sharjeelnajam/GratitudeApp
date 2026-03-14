@@ -25,6 +25,7 @@ import { CardSelectionPhase } from './CardSelectionPhase';
 import { SharingPhase } from './SharingPhase';
 import { ClosingPhase } from './ClosingPhase';
 import { ChatModal, ChatMessage } from './ChatModal';
+import { AICompanionModal } from './AICompanionModal';
 
 interface RoomSessionFlowProps {
   session: RoomSession;
@@ -52,6 +53,7 @@ export function RoomSessionFlow({
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [shares, setShares] = useState<Array<{ participantId: string; participantName: string; content: string }>>([]);
   const [chatModalVisible, setChatModalVisible] = useState(false);
+  const [companionModalVisible, setCompanionModalVisible] = useState(false);
   const [localChatMessages, setLocalChatMessages] = useState<ChatMessage[]>([]);
 
   const chatMessages = externalChatMessages ?? localChatMessages;
@@ -223,12 +225,23 @@ export function RoomSessionFlow({
         </LiveEffectVideoBackground>
       )}
       <TouchableOpacity
+        style={[styles.companionIconButton, { bottom: Math.max(insets.bottom, 24) }]}
+        onPress={() => setCompanionModalVisible(true)}
+        activeOpacity={0.7}
+      >
+        <MaterialIcons name="self-improvement" size={26} color="#FFFFFF" />
+      </TouchableOpacity>
+      <TouchableOpacity
         style={[styles.chatIconButton, { bottom: Math.max(insets.bottom, 24) }]}
         onPress={() => setChatModalVisible(true)}
         activeOpacity={0.7}
       >
         <MaterialIcons name="chat-bubble-outline" size={26} color="#FFFFFF" />
       </TouchableOpacity>
+      <AICompanionModal
+        visible={companionModalVisible}
+        onClose={() => setCompanionModalVisible(false)}
+      />
       <ChatModal
         visible={chatModalVisible}
         onClose={() => setChatModalVisible(false)}
@@ -245,6 +258,18 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     position: 'relative',
+  },
+  companionIconButton: {
+    position: 'absolute',
+    left: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(110, 231, 183, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(110, 231, 183, 0.3)',
   },
   chatIconButton: {
     position: 'absolute',

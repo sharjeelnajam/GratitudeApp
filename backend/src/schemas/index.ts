@@ -9,3 +9,8 @@ export {
   IRoomSession,
   SessionState,
 } from './room-session.schema';
+export {
+  AIConversation,
+  IAIConversation,
+  IMessage,
+} from './ai-conversation.schema';

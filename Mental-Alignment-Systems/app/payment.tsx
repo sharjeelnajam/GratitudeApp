@@ -15,7 +15,7 @@ import { SvgXml } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { Text } from '@/shared/ui';
-import { createPayPalOrder, getSubscriptionStatus } from '@/services/billing/billingService';
+import { createPayPalOrder, getSubscriptionStatus, activateSubscription } from '@/services/billing/billingService';
 import { SHOW_PAYMENT_ALWAYS } from '@/features/payments/config';
 
 const { width } = Dimensions.get('window');
@@ -97,13 +97,16 @@ export default function PaymentScreen() {
   const startSquareCheckout = async () => {
     if (loadingProvider) return;
     setError(null);
-
-    if (SHOW_PAYMENT_ALWAYS) {
+    setLoadingProvider('square');
+    try {
+      await activateSubscription('square');
+      router.replace('/welcome');
+    } catch {
+      // User may not be authenticated yet — send to login first
       router.replace('/login');
-      return;
+    } finally {
+      setLoadingProvider(null);
     }
-
-    setError('Square payments are not yet configured. Please use PayPal.');
   };
 
   return (

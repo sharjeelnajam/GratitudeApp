@@ -8,6 +8,7 @@ import cors from 'cors';
 import { authRouter } from './routes/auth';
 import { roomsRouter } from './routes/rooms';
 import { billingRouter } from './routes/billing';
+import { aiRouter } from './routes/ai';
 import { authMiddleware } from './middleware/auth';
 
 const app = express();
@@ -40,5 +41,8 @@ app.use('/billing', billingRouter);
 
 // Room HTTP API (protected)
 app.use('/rooms', authMiddleware, roomsRouter);
+
+// AI companion (protected)
+app.use('/ai', aiRouter);
 
 export { app };
