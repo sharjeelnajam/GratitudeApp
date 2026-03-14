@@ -1,6 +1,3 @@
-const PAYPAL_ENV_URL = process.env.EXPO_PUBLIC_PAYPAL_CHECKOUT_URL ?? '';
-const SQUARE_ENV_URL = process.env.EXPO_PUBLIC_SQUARE_CHECKOUT_URL ?? '';
-
 /**
  * SHOW_PAYMENT_ALWAYS
  *
@@ -9,26 +6,9 @@ const SQUARE_ENV_URL = process.env.EXPO_PUBLIC_SQUARE_CHECKOUT_URL ?? '';
  * database changes are made.
  *
  * Set to `false` for normal behaviour: payment screen only appears when the user's
- * subscription is inactive or expired.
+ * subscription is inactive or expired. PayPal checkout goes through the real API.
  */
-export const SHOW_PAYMENT_ALWAYS = true;
+export const SHOW_PAYMENT_ALWAYS = false;
 
-export const paymentConfig = {
-  paypalCheckoutUrl: PAYPAL_ENV_URL,
-  squareCheckoutUrl: SQUARE_ENV_URL,
-};
-
-export function assertPaymentConfig(provider: 'paypal' | 'square') {
-  const url = provider === 'paypal' ? paymentConfig.paypalCheckoutUrl : paymentConfig.squareCheckoutUrl;
-  if (!url) {
-    const envName =
-      provider === 'paypal'
-        ? 'EXPO_PUBLIC_PAYPAL_CHECKOUT_URL'
-        : 'EXPO_PUBLIC_SQUARE_CHECKOUT_URL';
-    throw new Error(
-      `${provider === 'paypal' ? 'PayPal' : 'Square'} is not configured yet. Set ${envName} in your environment.`
-    );
-  }
-  return url;
-}
+export const PAYPAL_CLIENT_ID = process.env.EXPO_PUBLIC_PAYPAL_CLIENT_ID ?? '';
 

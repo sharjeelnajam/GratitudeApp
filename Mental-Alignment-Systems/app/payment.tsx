@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
 import { Text } from '@/shared/ui';
-import { activateSubscription } from '@/services/billing/billingService';
+import { createPayPalOrder, getSubscriptionStatus } from '@/services/billing/billingService';
 import { SHOW_PAYMENT_ALWAYS } from '@/features/payments/config';
 
 const { width } = Dimensions.get('window');
@@ -22,7 +25,6 @@ type Provider = 'paypal' | 'square';
 
 const PAYPAL_LOGO_XML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="7.056000232696533 3 37.35095977783203 45"><g clip-path="url(#a)"><path fill="#002991" d="M38.914 13.35c0 5.574-5.144 12.15-12.927 12.15H18.49l-.368 2.322L16.373 39H7.056l5.605-36h15.095c5.083 0 9.082 2.833 10.555 6.77a9.687 9.687 0 0 1 .603 3.58z"></path><path fill="#60CDFF" d="M44.284 23.7A12.894 12.894 0 0 1 31.53 34.5h-5.206L24.157 48H14.89l1.483-9 1.75-11.178.367-2.322h7.497c7.773 0 12.927-6.576 12.927-12.15 3.825 1.974 6.055 5.963 5.37 10.35z"></path><path fill="#008CFF" d="M38.914 13.35C37.31 12.511 35.365 12 33.248 12h-12.64L18.49 25.5h7.497c7.773 0 12.927-6.576 12.927-12.15z"></path></g></svg>`;
 
-// Simplified Square "double square" mark so it renders similarly sized to the PayPal icon.
 const SQUARE_LOGO_XML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <rect x="4" y="4" width="40" height="40" rx="8" ry="8" fill="none" stroke="#0B1020" stroke-width="3" />
   <rect x="15" y="15" width="18" height="18" rx="4" ry="4" fill="none" stroke="#0B1020" stroke-width="3" />
@@ -32,32 +34,76 @@ export default function PaymentScreen() {
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const pendingCheckRef = useRef(false);
 
-  const startCheckout = async (provider: Provider) => {
+  // When app returns to foreground after PayPal browser, check subscription
+  useEffect(() => {
+    const handleAppState = async (state: AppStateStatus) => {
+      if (state === 'active' && pendingCheckRef.current) {
+        pendingCheckRef.current = false;
+        try {
+          const sub = await getSubscriptionStatus();
+          if (sub.isActive) {
+            console.log('[Payment] Subscription active after PayPal return');
+            router.replace('/welcome');
+          }
+        } catch {
+          // Ignore — user can retry
+        }
+      }
+    };
+    const subscription = AppState.addEventListener('change', handleAppState);
+    return () => subscription.remove();
+  }, [router]);
+
+  const startPayPalCheckout = async () => {
     if (loadingProvider) return;
     setError(null);
 
-    // Demo / client preview mode — skip payment processing, go to login
     if (SHOW_PAYMENT_ALWAYS) {
       router.replace('/login');
       return;
     }
 
-    setLoadingProvider(provider);
+    setLoadingProvider('paypal');
     try {
-      const subscription = await activateSubscription(provider);
-      if (!subscription.isActive) {
-        setError('Subscription could not be activated. Please try again.');
-        return;
+      const order = await createPayPalOrder();
+      console.log('[Payment] PayPal order created:', order.orderId);
+
+      pendingCheckRef.current = true;
+      await WebBrowser.openBrowserAsync(order.approvalUrl, {
+        dismissButtonStyle: 'close',
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
+      });
+
+      // Browser dismissed — check if payment was completed
+      const sub = await getSubscriptionStatus();
+      if (sub.isActive) {
+        router.replace('/welcome');
+      } else {
+        pendingCheckRef.current = false;
       }
-      router.replace('/welcome');
     } catch (e) {
+      pendingCheckRef.current = false;
       const message =
-        e instanceof Error ? e.message : 'Something went wrong starting your subscription.';
+        e instanceof Error ? e.message : 'Something went wrong with PayPal checkout.';
+      console.error('[Payment] PayPal error:', message);
       setError(message);
     } finally {
       setLoadingProvider(null);
     }
+  };
+
+  const startSquareCheckout = async () => {
+    if (loadingProvider) return;
+    setError(null);
+
+    if (SHOW_PAYMENT_ALWAYS) {
+      router.replace('/login');
+      return;
+    }
+
+    setError('Square payments are not yet configured. Please use PayPal.');
   };
 
   return (
@@ -98,7 +144,7 @@ export default function PaymentScreen() {
                     loadingProvider && loadingProvider !== 'paypal' && styles.buttonDisabled,
                   ]}
                   activeOpacity={0.9}
-                  onPress={() => startCheckout('paypal')}
+                  onPress={startPayPalCheckout}
                   disabled={!!loadingProvider}
                 >
                   {loadingProvider === 'paypal' ? (
@@ -127,7 +173,7 @@ export default function PaymentScreen() {
                     loadingProvider && loadingProvider !== 'square' && styles.buttonDisabled,
                   ]}
                   activeOpacity={0.9}
-                  onPress={() => startCheckout('square')}
+                  onPress={startSquareCheckout}
                   disabled={!!loadingProvider}
                 >
                   {loadingProvider === 'square' ? (

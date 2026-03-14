@@ -1,11 +1,6 @@
 import { API_URL } from '@/config/api';
 import { getIdToken } from '@/services/auth';
 
-export type CheckoutLinks = {
-  paypalUrl: string | null;
-  squareUrl: string | null;
-};
-
 export type Subscription = {
   isActive: boolean;
   status: 'active' | 'expired' | 'canceled' | 'none';
@@ -17,60 +12,59 @@ export type Subscription = {
   expiresAt: string | null;
 };
 
-let cachedLinks: CheckoutLinks | null = null;
+export type PayPalOrder = {
+  orderId: string;
+  approvalUrl: string;
+};
 
-export async function fetchCheckoutLinks(): Promise<CheckoutLinks> {
-  if (cachedLinks) return cachedLinks;
-  try {
-    const res = await fetch(`${API_URL}/billing/checkout-links`);
-    if (!res.ok) {
-      throw new Error(`Failed to load checkout links (${res.status})`);
-    }
-    const data = (await res.json()) as CheckoutLinks;
-    cachedLinks = data;
-    return data;
-  } catch (e) {
-    console.log(
-      '[Billing] Failed to fetch checkout links, falling back to client env:',
-      e instanceof Error ? e.message : e
-    );
-    return { paypalUrl: null, squareUrl: null };
-  }
+async function authHeaders(): Promise<Record<string, string>> {
+  const token = await getIdToken();
+  if (!token) throw new Error('Not authenticated');
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
 }
 
-export async function getSubscriptionStatus(): Promise<Subscription> {
-  const token = await getIdToken();
-  if (!token) {
-    throw new Error('Not authenticated');
-  }
-  const res = await fetch(`${API_URL}/billing/subscription`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+/**
+ * Creates a PayPal order on the backend and returns the approval URL
+ * that should be opened in a browser for the user to complete payment.
+ */
+export async function createPayPalOrder(): Promise<PayPalOrder> {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_URL}/billing/paypal/create-order`, {
+    method: 'POST',
+    headers,
   });
   if (!res.ok) {
-    throw new Error('Failed to load subscription status');
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Failed to create PayPal order (${res.status})`);
   }
+  return (await res.json()) as PayPalOrder;
+}
+
+/**
+ * Checks the current user's subscription status.
+ */
+export async function getSubscriptionStatus(): Promise<Subscription> {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_URL}/billing/subscription`, { headers });
+  if (!res.ok) throw new Error('Failed to load subscription status');
   const data = (await res.json()) as { subscription: Subscription };
   return data.subscription;
 }
 
+/**
+ * Legacy: manually marks the user as paid (kept for backwards compatibility).
+ */
 export async function activateSubscription(provider?: 'paypal' | 'square'): Promise<Subscription> {
-  const token = await getIdToken();
-  if (!token) {
-    throw new Error('Not authenticated');
-  }
+  const headers = await authHeaders();
   const res = await fetch(`${API_URL}/billing/subscription/mark-paid`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
     body: JSON.stringify({ provider }),
   });
-  if (!res.ok) {
-    throw new Error('Failed to activate subscription');
-  }
+  if (!res.ok) throw new Error('Failed to activate subscription');
   const data = (await res.json()) as { subscription: Subscription };
   return data.subscription;
 }

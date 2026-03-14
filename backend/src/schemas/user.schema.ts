@@ -19,6 +19,8 @@ export interface IUser extends Document {
   subscriptionLastPaidAt?: Date | null;
   subscriptionStatus?: 'active' | 'expired' | 'canceled';
   subscriptionExpiresAt?: Date | null;
+  paypalOrderId?: string;
+  paypalCaptureId?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -36,6 +38,8 @@ const UserSchema = new Schema<IUser>(
     subscriptionLastPaidAt: { type: Date, default: null },
     subscriptionStatus: { type: String, default: 'expired' },
     subscriptionExpiresAt: { type: Date, default: null },
+    paypalOrderId: { type: String, default: '' },
+    paypalCaptureId: { type: String, default: '' },
   },
   { collection: 'users' }
 );
