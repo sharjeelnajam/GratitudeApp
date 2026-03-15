@@ -13,12 +13,12 @@ import { authMiddleware } from './middleware/auth';
 
 const app = express();
 
-const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [
-  'http://localhost:8081',
-  'http://localhost:19006',
-];
+const rawCors = process.env.CORS_ORIGINS?.trim();
+const corsOrigin = rawCors === '*'
+  ? true
+  : rawCors?.split(',').map((o) => o.trim()) ?? ['http://localhost:8081', 'http://localhost:19006'];
 
-app.use(cors({ origin: corsOrigins, credentials: true }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
 
 // Request logging - logs when API is hit
