@@ -1,0 +1,174 @@
+{
+  "common": {
+    "continue": "继续",
+    "cancel": "取消",
+    "save": "保存",
+    "back": "返回",
+    "next": "下一步",
+    "loading": "加载中...",
+    "error": "出了点问题",
+    "retry": "重试",
+    "ok": "确定",
+    "enter": "进入"
+  },
+  "welcome": {
+    "appTitle": "Gratitude Keeper",
+    "appSubtitle": "你的心理健康庇护所",
+    "appSubtext": "一个安全的空间。",
+    "title": "欢迎",
+    "subtitle": "点击下方开始你的旅程",
+    "enter": "进入"
+  },
+  "auth": {
+    "welcomeBack": "欢迎回来",
+    "signInSubtitle": "登录以继续你的旅程",
+    "emailAndPassword": "邮箱和密码",
+    "emailPlaceholder": "电子邮件",
+    "passwordPlaceholder": "密码（至少4个字符）",
+    "passwordPlaceholder6": "密码（至少6个字符）",
+    "confirmPasswordPlaceholder": "确认密码",
+    "namePlaceholder": "姓名（可选）",
+    "forgotPassword": "忘记密码？",
+    "signInWithEmail": "使用邮箱登录",
+    "orContinueWith": "或使用以下方式继续",
+    "noAccount": "没有账户？创建一个",
+    "hasAccount": "已有账户？登录",
+    "signInHint": "通过Firebase登录。你的密码永远不会被本地存储。",
+    "signInFailed": "登录失败。请检查邮箱和密码。",
+    "googleSignInFailed": "Google登录失败",
+    "appleSetupRequired": "Apple登录需要额外设置。",
+    "createAccount": "创建账户",
+    "joinSubtitle": "加入并开始你的旅程",
+    "signUpFailed": "注册失败",
+    "googleSignUpFailed": "Google注册失败",
+    "passwordsNoMatch": "密码不匹配",
+    "passwordHint": "你的密码永远不会被本地存储。"
+  },
+  "forgotPassword": {
+    "title": "重置密码",
+    "subtitle": "输入你的邮箱，我们将发送重置链接给你。",
+    "emailLabel": "你的邮箱地址",
+    "emailPlaceholder": "hello@example.com",
+    "sendReset": "发送重置邮件",
+    "backToSignIn": "返回登录",
+    "rememberedIt": "想起来了？登录",
+    "successMessage": "重置邮件已发送！请检查你的收件箱（和垃圾邮件文件夹）。",
+    "hint": "重置链接将在1小时后过期。由Firebase Auth提供支持。",
+    "noAccountFound": "未找到此邮箱地址对应的账户。",
+    "tooManyAttempts": "尝试次数过多。请稍等后再试。",
+    "sendFailed": "发送重置邮件失败。请重试。"
+  },
+  "intro": {
+    "appName": "Gratitude Keeper",
+    "appSubtitle": "你的心理健康庇护所",
+    "yourJourney": "你的旅程",
+    "yourNote": "你的笔记",
+    "loadingAudio": "加载中...",
+    "pauseAudio": "暂停音频",
+    "playAudio": "播放音频消息",
+    "cards": {
+      "neuroplasticity": {
+        "title": "神经可塑性",
+        "description": "我们的方法重新连接你的大脑，更新你的能量，与全新的幸福节奏保持一致。"
+      },
+      "higherVibration": {
+        "title": "更高振动",
+        "description": "受感恩的更高振动启发，创造通往平静、喜悦和情感自由的新路径。"
+      },
+      "personalGrowth": {
+        "title": "个人成长",
+        "description": "增强自信心，点燃灵感，建立韧性，创造个人突破。"
+      },
+      "mindfulPresence": {
+        "title": "正念存在",
+        "description": "一个平静的临在和对齐空间，你可以在没有压力或期望的情况下回来。"
+      }
+    }
+  },
+  "questions": {
+    "title": "与自己对话",
+    "finishSentence": "完成这个句子",
+    "enterRooms": "进入房间",
+    "prompts": {
+      "1": "我感觉",
+      "2": "我在寻找",
+      "3": "我需要",
+      "4": "我怎样才能",
+      "5": "我想要",
+      "6": "我不知道",
+      "7": "你在期望什么",
+      "8": "你知道你的感受吗"
+    }
+  },
+  "payment": {
+    "kicker": "进入之前",
+    "title": "解锁你的心理对齐房间",
+    "subtitle": "选择安全的支付方式以激活访问权限。你将被重定向到受信任的结账页面并自动返回。",
+    "payWithPaypal": "使用PayPal支付",
+    "paypalDescription": "使用你的PayPal余额、银行账户或银行卡。你永远不需要与我们共享完整的卡信息。",
+    "continueWithPaypal": "使用PayPal继续",
+    "payWithSquare": "使用Square支付",
+    "squareDescription": "通过Square的加密结账体验安全地使用任何主要信用卡支付。",
+    "continueWithSquare": "使用Square继续",
+    "footerHint": "支付由PayPal或Square处理。我们永远不会在此设备上存储你的完整卡信息。",
+    "errorTitle": "出了点问题",
+    "paypalError": "PayPal结账出现问题。"
+  },
+  "rooms": {
+    "title": "房间",
+    "subtitle": "选择一个与你产生共鸣的空间",
+    "fireplace": {
+      "name": "壁炉",
+      "description": "温暖、舒适、接地",
+      "subtext": "傍晚或收尾"
+    },
+    "ocean": {
+      "name": "海洋",
+      "description": "平静、宁静、流动",
+      "subtext": "压力、过渡、重置"
+    },
+    "forest": {
+      "name": "森林",
+      "description": "接地、自然、清晰",
+      "subtext": "设定意图和方向"
+    },
+    "nightSky": {
+      "name": "星空",
+      "description": "深邃、沉思、广阔",
+      "subtext": "反思和深度"
+    },
+    "selectRoom": "选择一个房间",
+    "enteringSpace": "正在进入你的空间...",
+    "shareRoom": "分享房间",
+    "shareInviteMessage": "在 Gratitude Keeper 与我一起进入这个空间。在手机上点击下方链接（如未安装请先安装应用）："
+  },
+  "alignment": {
+    "title": "对齐课程",
+    "description": "一个用于存在和对齐的空间",
+    "infoText": "这是一个内在对齐和存在的空间。慢慢来，不着急。",
+    "visitRoom": "访问房间"
+  },
+  "liveRoom": {
+    "title": "引导对齐房间",
+    "joiningRoom": "加入房间中…",
+    "participants": "参与者",
+    "session": "课程",
+    "leaveRoom": "离开房间"
+  },
+  "close": {
+    "title": "谢谢",
+    "message": "保重",
+    "returnHome": "返回首页"
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "selectLanguage": "选择语言",
+    "signOut": "退出登录"
+  },
+  "tabs": {
+    "home": "首页",
+    "rooms": "房间",
+    "settings": "设置"
+  }
+}

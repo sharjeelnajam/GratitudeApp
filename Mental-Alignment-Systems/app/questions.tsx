@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
   Dimensions,
 } from 'react-native';
@@ -18,7 +19,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, FadeInView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 const CARD_PADDING_H = 20;
@@ -29,28 +31,21 @@ const CARD_MAX_WIDTH = Math.min(width - CARD_PADDING_H * 2, 380);
 /** Each bottom button gets exactly half the row so both stay visible on all screens */
 const BOTTOM_BUTTON_WIDTH = Math.floor((width - CARD_PADDING_H * 2 - BOTTOM_GAP) / 2);
 
-const REFLECTION_QUESTIONS = [
-  { id: '1', prompt: 'I feel', placeholder: '…' },
-  { id: '2', prompt: 'I am searching for', placeholder: '…' },
-  { id: '3', prompt: 'I need', placeholder: '…' },
-  { id: '4', prompt: 'How can I', placeholder: '…' },
-  { id: '5', prompt: 'I want', placeholder: '…' },
-  { id: '6', prompt: "I don't know", placeholder: '…' },
-  { id: '7', prompt: 'What are you hoping for', placeholder: '…' },
-  { id: '8', prompt: 'Do you know what you are feeling', placeholder: '…' },
-];
+const REFLECTION_QUESTION_IDS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-const TOTAL = REFLECTION_QUESTIONS.length;
+const TOTAL = REFLECTION_QUESTION_IDS.length;
 
 export default function QuestionsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  // Clamp index to valid range so hot reload or edge cases never break rendering
   const safeIndex = Math.min(Math.max(currentIndex, 0), TOTAL - 1);
-  const q = REFLECTION_QUESTIONS[safeIndex];
+  const qId = REFLECTION_QUESTION_IDS[safeIndex] ?? '1';
   const isFirst = safeIndex === 0;
   const isLast = safeIndex === TOTAL - 1;
 
@@ -72,6 +67,27 @@ export default function QuestionsScreen() {
     }
   };
 
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (event) => {
+      setKeyboardVisible(true);
+      setKeyboardHeight(event.endCoordinates?.height ?? 0);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const keyboardLift = Math.max(0, keyboardHeight - insets.bottom);
+
   return (
     <View style={styles.opaqueBackground}>
       <LinearGradient
@@ -82,21 +98,21 @@ export default function QuestionsScreen() {
       >
         <KeyboardAvoidingView
           style={styles.keyboardView}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 44 : 0}
         >
           {/* Top: header + progress */}
           <FadeInView duration={500} delay={80}>
             <View style={styles.header}>
-              <Text style={styles.title} numberOfLines={1}>Check in with yourself</Text>
+              <Text style={styles.title} numberOfLines={1}>{t('questions.title')}</Text>
               <View style={styles.progressRow}>
                 <Text style={styles.progressText}>
                   {currentIndex + 1} of {TOTAL}
                 </Text>
                 <View style={styles.progressDots}>
-                  {REFLECTION_QUESTIONS.map((_, i) => (
+                  {REFLECTION_QUESTION_IDS.map((id, i) => (
                     <View
-                      key={`dot-${REFLECTION_QUESTIONS[i].id}`}
+                      key={`dot-${id}`}
                       style={[
                         styles.dot,
                         i === currentIndex && styles.dotActive,
@@ -114,14 +130,14 @@ export default function QuestionsScreen() {
             <View style={styles.questionCard}>
               <View style={styles.cardAccent} />
               <View style={styles.cardInner}>
-                <Text style={styles.promptLabel}>Finish the sentence</Text>
-                <Text style={styles.promptText}>{q.prompt}</Text>
+                <Text style={styles.promptLabel}>{t('questions.finishSentence')}</Text>
+                <Text style={styles.promptText}>{t(`questions.prompts.${qId}`)}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder={q.placeholder}
+                  placeholder="…"
                   placeholderTextColor="rgba(255, 255, 255, 0.4)"
-                  value={answers[q.id] ?? ''}
-                  onChangeText={(text) => updateAnswer(q.id, text)}
+                  value={answers[qId] ?? ''}
+                  onChangeText={(text) => updateAnswer(qId, text)}
                   multiline
                   maxLength={120}
                   selectionColor="rgba(139, 92, 246, 0.6)"
@@ -132,7 +148,15 @@ export default function QuestionsScreen() {
           </View>
 
           {/* Bottom: Back + Next / Enter Rooms – fixed widths so both always visible */}
-          <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+          <View
+            style={[
+              styles.bottomBar,
+              {
+                paddingBottom: keyboardVisible ? 12 : Math.max(insets.bottom, 24),
+                marginBottom: keyboardVisible ? keyboardLift : 0,
+              },
+            ]}
+          >
             {isFirst ? (
               <View style={[styles.backPlaceholder, { width: BOTTOM_BUTTON_WIDTH }]} />
             ) : (
@@ -141,7 +165,7 @@ export default function QuestionsScreen() {
                 activeOpacity={0.7}
                 style={[styles.backButton, { width: BOTTOM_BUTTON_WIDTH }]}
               >
-                <Text style={styles.backButtonText}>Back</Text>
+                <Text style={styles.backButtonText}>{t('common.back')}</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
@@ -158,7 +182,7 @@ export default function QuestionsScreen() {
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                {isLast ? 'Enter Rooms' : 'Next'}
+                {isLast ? t('questions.enterRooms') : t('common.next')}
               </Text>
             </TouchableOpacity>
           </View>

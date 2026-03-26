@@ -26,11 +26,13 @@ import { Text, FadeInView } from '@/shared/ui';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
 import { promptGoogleSignIn } from '@/services/auth';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = Math.min(width * 0.28, 100);
 
 export default function SignUpScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signUpEmail, loading: authLoading, isAuthenticated, error } = useAuthContext();
   const [name, setName] = useState('');
@@ -67,7 +69,7 @@ export default function SignUpScreen() {
   const handleSignUpWithEmail = async () => {
     if (!canSubmit || isLoading) return;
     if (!passwordsMatch) {
-      setLocalError('Passwords do not match');
+      setLocalError(t('auth.passwordsNoMatch'));
       return;
     }
     setLocalError(null);
@@ -78,7 +80,7 @@ export default function SignUpScreen() {
       console.log('[SignUp] Success');
       router.replace('/questions');
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Sign up failed';
+      const msg = e instanceof Error ? e.message : t('auth.signUpFailed');
       console.log('[SignUp] Error:', msg);
       setLocalError(msg);
     } finally {
@@ -96,7 +98,7 @@ export default function SignUpScreen() {
       console.log('[SignUp] Google success');
       router.replace('/intro');
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Google sign up failed';
+      const msg = e instanceof Error ? e.message : t('auth.googleSignUpFailed');
       console.log('[SignUp] Google error:', msg);
       setLocalError(msg);
     } finally {
@@ -148,8 +150,8 @@ export default function SignUpScreen() {
                   resizeMode="cover"
                 />
               </View>
-              <Text style={styles.title}>Create account</Text>
-              <Text style={styles.subtitle}>Join and begin your journey</Text>
+              <Text style={styles.title}>{t('auth.createAccount')}</Text>
+              <Text style={styles.subtitle}>{t('auth.joinSubtitle')}</Text>
             </View>
           </FadeInView>
 
@@ -160,10 +162,10 @@ export default function SignUpScreen() {
           ) : null}
 
           <Animated.View style={[styles.formCard, { opacity: fadeAnim }]}>
-            <Text style={styles.sectionLabel}>Email & password</Text>
+            <Text style={styles.sectionLabel}>{t('auth.emailAndPassword')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Name (optional)"
+              placeholder={t('auth.namePlaceholder')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={name}
               onChangeText={setName}
@@ -172,7 +174,7 @@ export default function SignUpScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder={t('auth.emailPlaceholder')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={email}
               onChangeText={setEmail}
@@ -183,7 +185,7 @@ export default function SignUpScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Password (min 6 characters)"
+              placeholder={t('auth.passwordPlaceholder6')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={password}
               onChangeText={setPassword}
@@ -192,7 +194,7 @@ export default function SignUpScreen() {
             />
             <TextInput
               style={[styles.input, styles.inputLast]}
-              placeholder="Confirm password"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -211,14 +213,14 @@ export default function SignUpScreen() {
               {isLoading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.primaryButtonText}>Create account</Text>
+                <Text style={styles.primaryButtonText}>{t('auth.createAccount')}</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with</Text>
+            <Text style={styles.dividerText}>{t('auth.orContinueWith')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -240,12 +242,12 @@ export default function SignUpScreen() {
             disabled={isLoading}
           >
             <Text style={styles.loginLinkText}>
-              Already have an account? Sign in
+              {t('auth.hasAccount')}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.hint}>
-            Your password is never stored locally.
+            {t('auth.passwordHint')}
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

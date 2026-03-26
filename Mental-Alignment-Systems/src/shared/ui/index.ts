@@ -39,3 +39,5 @@ export { Header } from './Header';
 export type { HeaderProps } from './Header';
 
 export { UserHeader } from './UserHeader';
+
+export { LanguageSwitcher } from './LanguageSwitcher';

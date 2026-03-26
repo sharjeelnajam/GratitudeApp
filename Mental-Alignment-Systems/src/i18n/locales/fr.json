@@ -1,0 +1,174 @@
+{
+  "common": {
+    "continue": "Continuer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "back": "Retour",
+    "next": "Suivant",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "ok": "OK",
+    "enter": "Entrer"
+  },
+  "welcome": {
+    "appTitle": "Gratitude Keeper",
+    "appSubtitle": "Votre sanctuaire de bien-être mental",
+    "appSubtext": "Un espace sûr.",
+    "title": "Bienvenue",
+    "subtitle": "Appuyez ci-dessous pour commencer votre parcours",
+    "enter": "Entrer"
+  },
+  "auth": {
+    "welcomeBack": "Bon retour",
+    "signInSubtitle": "Connectez-vous pour continuer votre parcours",
+    "emailAndPassword": "E-mail et mot de passe",
+    "emailPlaceholder": "E-mail",
+    "passwordPlaceholder": "Mot de passe (min 4 caractères)",
+    "passwordPlaceholder6": "Mot de passe (min 6 caractères)",
+    "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+    "namePlaceholder": "Nom (optionnel)",
+    "forgotPassword": "Mot de passe oublié ?",
+    "signInWithEmail": "Se connecter par e-mail",
+    "orContinueWith": "ou continuer avec",
+    "noAccount": "Pas de compte ? Créer un",
+    "hasAccount": "Déjà un compte ? Se connecter",
+    "signInHint": "Connexion via Firebase. Votre mot de passe n'est jamais stocké localement.",
+    "signInFailed": "Échec de connexion. Vérifiez l'e-mail et le mot de passe.",
+    "googleSignInFailed": "Échec de la connexion Google",
+    "appleSetupRequired": "La connexion Apple nécessite une configuration supplémentaire.",
+    "createAccount": "Créer un compte",
+    "joinSubtitle": "Rejoignez et commencez votre parcours",
+    "signUpFailed": "Échec de l'inscription",
+    "googleSignUpFailed": "Échec de l'inscription Google",
+    "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+    "passwordHint": "Votre mot de passe n'est jamais stocké localement."
+  },
+  "forgotPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Entrez votre e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "emailLabel": "Votre adresse e-mail",
+    "emailPlaceholder": "bonjour@exemple.com",
+    "sendReset": "Envoyer l'e-mail de réinitialisation",
+    "backToSignIn": "Retour à la connexion",
+    "rememberedIt": "Vous vous en souvenez ? Se connecter",
+    "successMessage": "E-mail de réinitialisation envoyé ! Vérifiez votre boîte de réception (et le dossier spam).",
+    "hint": "Le lien expire après 1 heure. Propulsé par Firebase Auth.",
+    "noAccountFound": "Aucun compte trouvé avec cette adresse e-mail.",
+    "tooManyAttempts": "Trop de tentatives. Veuillez patienter et réessayer.",
+    "sendFailed": "Échec de l'envoi de l'e-mail. Veuillez réessayer."
+  },
+  "intro": {
+    "appName": "Gratitude Keeper",
+    "appSubtitle": "Votre sanctuaire de bien-être mental",
+    "yourJourney": "Votre parcours",
+    "yourNote": "Votre note",
+    "loadingAudio": "Chargement...",
+    "pauseAudio": "Pause audio",
+    "playAudio": "Écouter le message audio",
+    "cards": {
+      "neuroplasticity": {
+        "title": "Neuroplasticité",
+        "description": "Notre approche recâble votre cerveau, renouvelle votre énergie et s'aligne sur un nouveau rythme de bien-être."
+      },
+      "higherVibration": {
+        "title": "Vibration supérieure",
+        "description": "Inspiré par la vibration supérieure de la gratitude, créant de nouvelles voies menant à la paix, la joie et la liberté émotionnelle."
+      },
+      "personalGrowth": {
+        "title": "Croissance personnelle",
+        "description": "Renforcez la confiance en soi, allumez l'inspiration, développez la résilience et créez des percées personnelles."
+      },
+      "mindfulPresence": {
+        "title": "Présence attentive",
+        "description": "Un espace calme pour la présence et l'alignement, où vous pouvez revenir sans pression ni attentes."
+      }
+    }
+  },
+  "questions": {
+    "title": "Faites le point avec vous-même",
+    "finishSentence": "Complétez la phrase",
+    "enterRooms": "Entrer dans les salles",
+    "prompts": {
+      "1": "Je ressens",
+      "2": "Je cherche",
+      "3": "J'ai besoin de",
+      "4": "Comment puis-je",
+      "5": "Je veux",
+      "6": "Je ne sais pas",
+      "7": "Qu'espérez-vous",
+      "8": "Savez-vous ce que vous ressentez"
+    }
+  },
+  "payment": {
+    "kicker": "Avant d'entrer",
+    "title": "Débloquez votre salle d'alignement mental",
+    "subtitle": "Choisissez un mode de paiement sécurisé pour activer votre accès. Vous serez redirigé vers un paiement de confiance.",
+    "payWithPaypal": "Payer avec PayPal",
+    "paypalDescription": "Utilisez votre solde PayPal, compte bancaire ou cartes. Vous ne partagez jamais vos données de carte complètes.",
+    "continueWithPaypal": "Continuer avec PayPal",
+    "payWithSquare": "Payer avec Square",
+    "squareDescription": "Payez en toute sécurité avec n'importe quelle carte majeure via le paiement chiffré de Square.",
+    "continueWithSquare": "Continuer avec Square",
+    "footerHint": "Les paiements sont traités par PayPal ou Square. Nous ne stockons jamais vos données de carte sur cet appareil.",
+    "errorTitle": "Une erreur est survenue",
+    "paypalError": "Une erreur est survenue avec le paiement PayPal."
+  },
+  "rooms": {
+    "title": "Salles",
+    "subtitle": "Choisissez un espace qui vous correspond",
+    "fireplace": {
+      "name": "Cheminée",
+      "description": "Chaleureux, douillet, ancrant",
+      "subtext": "Soirée ou clôture"
+    },
+    "ocean": {
+      "name": "Océan",
+      "description": "Calme, serein, fluide",
+      "subtext": "Stress, transitions, remises à zéro"
+    },
+    "forest": {
+      "name": "Forêt",
+      "description": "Ancrant, naturel, clair",
+      "subtext": "Définition d'intentions et direction"
+    },
+    "nightSky": {
+      "name": "Ciel étoilé",
+      "description": "Profond, contemplatif, vaste",
+      "subtext": "Réflexion et profondeur"
+    },
+    "selectRoom": "Sélectionnez une salle",
+    "enteringSpace": "Entrée dans votre espace...",
+    "shareRoom": "Partager la salle",
+    "shareInviteMessage": "Rejoins-moi dans cet espace dans Gratitude Keeper. Touche le lien ci-dessous sur ton téléphone (installe l'app si besoin) :"
+  },
+  "alignment": {
+    "title": "Session d'alignement",
+    "description": "Un espace de présence et d'alignement",
+    "infoText": "C'est un espace d'alignement intérieur et de présence. Prenez votre temps, rien ne presse.",
+    "visitRoom": "Visiter une salle"
+  },
+  "liveRoom": {
+    "title": "Salle d'alignement guidée",
+    "joiningRoom": "Rejoindre la salle…",
+    "participants": "Participants",
+    "session": "Session",
+    "leaveRoom": "Quitter la salle"
+  },
+  "close": {
+    "title": "Merci",
+    "message": "Prenez soin de vous",
+    "returnHome": "Retour à l'accueil"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "selectLanguage": "Choisir la langue",
+    "signOut": "Se déconnecter"
+  },
+  "tabs": {
+    "home": "Accueil",
+    "rooms": "Salles",
+    "settings": "Paramètres"
+  }
+}

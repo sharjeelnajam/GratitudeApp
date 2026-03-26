@@ -1,8 +1,8 @@
 /**
- * Welcome Home Screen
+ * Home Tab
  *
- * Shown after login. Premium entry with geometry image and glassmorphism.
- * Enter → intro (begin journey). Inspired by: https://gratitudekeeper.stillnessforpeace.com/
+ * Main landing screen after login. Premium entry with geometry image.
+ * Enter → intro (begin journey).
  */
 
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
@@ -11,14 +11,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 const PARTICLE_COUNT = 14;
-const RING_RADIUS = Math.min(width * 0.42, 165);
+const RING_RADIUS = Math.min(width * 0.36, 140);
 const PARTICLE_SIZE = 6;
 
-export default function WelcomeScreen() {
+export default function HomeTab() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -181,7 +183,7 @@ export default function WelcomeScreen() {
             <View style={styles.geometryGlow} />
             <View style={styles.geometryFrame}>
               <Image
-                source={require('../assets/images/geometry.jpeg')}
+                source={require('../../assets/images/geometry.jpeg')}
                 style={styles.geometryImage}
                 resizeMode="contain"
                 onLoad={() => setImageLoaded(true)}
@@ -198,13 +200,13 @@ export default function WelcomeScreen() {
           ]}
         >
           <Text variant="h1" style={styles.appTitle}>
-            Gratitude Keeper
+            {t('welcome.appTitle')}
           </Text>
           <Text variant="body" style={styles.appSubtitle}>
-            Your Mental Wellness Sanctuary
+            {t('welcome.appSubtitle')}
           </Text>
           <Text variant="caption" style={styles.appSubtext}>
-            A safe space.
+            {t('welcome.appSubtext')}
           </Text>
         </Animated.View>
 
@@ -215,10 +217,10 @@ export default function WelcomeScreen() {
           ]}
         >
           <Text variant="h1" style={styles.welcomeText}>
-            Welcome
+            {t('welcome.title')}
           </Text>
           <Text variant="body" style={styles.subtitleText}>
-            Tap below to begin your journey
+            {t('welcome.subtitle')}
           </Text>
         </Animated.View>
 
@@ -228,7 +230,7 @@ export default function WelcomeScreen() {
             activeOpacity={0.6}
             style={styles.buttonContainer}
           >
-            <Text style={styles.enterButtonText}>Enter</Text>
+            <Text style={styles.enterButtonText} numberOfLines={1} adjustsFontSizeToFit>{t('welcome.enter')}</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -242,16 +244,16 @@ const styles = StyleSheet.create({
   star: { position: 'absolute', width: 2, height: 2, borderRadius: 1, backgroundColor: '#FFFFFF' },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 32,
     paddingTop: 24,
-    paddingBottom: 48,
+    paddingBottom: 32,
   },
   geometryContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Math.min(48, height * 0.04),
+    marginBottom: Math.min(48, height * 0.05),
     position: 'relative',
   },
   particleRingWrapper: {
@@ -276,9 +278,9 @@ const styles = StyleSheet.create({
   geometryInner: { alignItems: 'center', justifyContent: 'center' },
   geometryGlow: {
     position: 'absolute',
-    width: Math.min(width * 0.8, 350),
-    height: Math.min(width * 0.8, 350),
-    borderRadius: Math.min(width * 0.4, 175),
+    width: Math.min(width * 0.68, 280),
+    height: Math.min(width * 0.68, 280),
+    borderRadius: Math.min(width * 0.34, 140),
     backgroundColor: 'rgba(139, 92, 246, 0.2)',
     shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 0 },
@@ -287,9 +289,9 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   geometryFrame: {
-    width: Math.min(width * 0.7, 300),
-    height: Math.min(width * 0.7, 300),
-    borderRadius: Math.min(width * 0.35, 150),
+    width: Math.min(width * 0.58, 240),
+    height: Math.min(width * 0.58, 240),
+    borderRadius: Math.min(width * 0.29, 120),
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 2,
     borderColor: 'rgba(139, 92, 246, 0.5)',
@@ -305,22 +307,22 @@ const styles = StyleSheet.create({
   geometryImage: {
     width: '90%',
     height: '90%',
-    borderRadius: Math.min(width * 0.315, 135),
+    borderRadius: Math.min(width * 0.26, 108),
   },
   innerGlow: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    borderRadius: Math.min(width * 0.35, 150),
+    borderRadius: Math.min(width * 0.29, 120),
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
     shadowColor: '#A78BFA',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 25,
   },
-  brandingContainer: { alignItems: 'center', marginBottom: Math.min(32, height * 0.03) },
+  brandingContainer: { alignItems: 'center', marginBottom: Math.min(20, height * 0.02) },
   appTitle: {
-    fontSize: 42,
+    fontSize: 38,
     fontWeight: '300',
     color: '#FFFFFF',
     fontFamily: 'serif',
@@ -332,9 +334,9 @@ const styles = StyleSheet.create({
   },
   appSubtitle: { fontSize: 18, color: 'rgba(255, 255, 255, 0.8)', marginBottom: 4, fontWeight: '400' },
   appSubtext: { fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', fontStyle: 'italic' },
-  textContainer: { alignItems: 'center', marginBottom: Math.min(48, height * 0.04) },
+  textContainer: { alignItems: 'center', marginBottom: Math.min(28, height * 0.025) },
   welcomeText: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: '300',
     color: '#FFFFFF',
     marginBottom: 16,
@@ -347,8 +349,8 @@ const styles = StyleSheet.create({
   },
   subtitleText: { fontSize: 16, color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', fontWeight: '400' },
   buttonContainer: {
-    width: '100%',
-    maxWidth: 280,
+    width: width * 0.7,
+    maxWidth: 320,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: 'rgba(139, 92, 246, 0.4)',
@@ -357,7 +359,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 14,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
   },
   enterButtonText: {
     color: 'rgba(139, 92, 246, 0.9)',

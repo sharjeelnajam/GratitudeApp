@@ -8,7 +8,7 @@
  * Set to `false` for normal behaviour: payment screen only appears when the user's
  * subscription is inactive or expired. PayPal checkout goes through the real API.
  */
-export const SHOW_PAYMENT_ALWAYS = false;
+export const SHOW_PAYMENT_ALWAYS = true;
 
 export const PAYPAL_CLIENT_ID = process.env.EXPO_PUBLIC_PAYPAL_CLIENT_ID ?? '';
 

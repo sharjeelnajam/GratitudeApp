@@ -9,8 +9,10 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { AmbientBackground, Container, Text, FadeInView, Button, Card } from '@/shared/ui';
 import { useTheme } from '@/theme';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function AlignmentSessionScreen() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -24,16 +26,16 @@ export default function AlignmentSessionScreen() {
           <FadeInView duration={theme.motion.animations.fadeIn.duration}>
             <View style={styles.content}>
               <Text variant="h2" style={styles.title}>
-                Alignment Session
+                {t('alignment.title')}
               </Text>
               
               <Text variant="contemplative" color="secondary" style={styles.description}>
-                A space for presence and alignment
+                {t('alignment.description')}
               </Text>
 
               <Card variant="elevated" padding="lg" style={styles.infoCard}>
                 <Text variant="body" style={styles.infoText}>
-                  This is a space for inner alignment and presence. Take your time, there's no rush.
+                  {t('alignment.infoText')}
                 </Text>
               </Card>
 
@@ -44,7 +46,7 @@ export default function AlignmentSessionScreen() {
                   onPress={() => router.push('/rooms/fireplace')}
                   style={styles.button}
                 >
-                  Visit a Room
+                  {t('alignment.visitRoom')}
                 </Button>
                 
                 <Button
@@ -53,7 +55,7 @@ export default function AlignmentSessionScreen() {
                   onPress={() => router.back()}
                   style={styles.button}
                 >
-                  Back
+                  {t('common.back')}
                 </Button>
               </View>
 

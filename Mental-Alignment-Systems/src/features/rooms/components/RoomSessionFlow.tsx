@@ -11,7 +11,6 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RoomSessionState, RoomSession, ClosingChoice } from '../types';
-import { FallingVideoBackground } from './FallingVideoBackground';
 import { LiveEffectVideoBackground } from './LiveEffectVideoBackground';
 import { FireRoomParallaxBackground } from './FireRoomParallaxBackground';
 import { BreathingActivityPhase } from './BreathingActivityPhase';
@@ -26,6 +25,7 @@ import { SharingPhase } from './SharingPhase';
 import { ClosingPhase } from './ClosingPhase';
 import { ChatModal, ChatMessage } from './ChatModal';
 import { AICompanionModal } from './AICompanionModal';
+import { ShareRoomButton } from './ShareRoomButton';
 
 interface RoomSessionFlowProps {
   session: RoomSession;
@@ -47,7 +47,6 @@ export function RoomSessionFlow({
   isChatOnline = true,
 }: RoomSessionFlowProps) {
   const insets = useSafeAreaInsets();
-  const [showFallingIntro, setShowFallingIntro] = useState(true);
   const [currentState, setCurrentState] = useState<RoomSessionState>(session.state);
   const [intention, setIntention] = useState<string>('');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -137,15 +136,6 @@ export function RoomSessionFlow({
     }, 1000);
   };
 
-  // After door opens: show starts-falling once, then switch to live-effect-1 for all phases
-  if (showFallingIntro) {
-    return (
-      <View style={styles.wrapper}>
-        <FallingVideoBackground loop={false} onPlaybackEnd={() => setShowFallingIntro(false)} />
-      </View>
-    );
-  }
-
   // Resolve the current phase content (no background here — background mounts once below)
   const currentPhase = (() => {
     switch (currentState) {
@@ -224,6 +214,10 @@ export function RoomSessionFlow({
           {currentPhase}
         </LiveEffectVideoBackground>
       )}
+      <ShareRoomButton
+        roomType={session.roomType}
+        style={[styles.shareIconButton, { top: Math.max(insets.top, 12) }]}
+      />
       <TouchableOpacity
         style={[styles.companionIconButton, { bottom: Math.max(insets.bottom, 24) }]}
         onPress={() => setCompanionModalVisible(true)}
@@ -258,6 +252,11 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     position: 'relative',
+  },
+  shareIconButton: {
+    position: 'absolute',
+    right: 24,
+    zIndex: 20,
   },
   companionIconButton: {
     position: 'absolute',

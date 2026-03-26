@@ -23,12 +23,14 @@ import { useRouter } from 'expo-router';
 import { Text, FadeInView } from '@/shared/ui';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 type ScreenState = 'idle' | 'loading' | 'success';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { resetPassword } = useAuthContext();
 
@@ -63,11 +65,11 @@ export default function ForgotPasswordScreen() {
       const raw = e instanceof Error ? e.message : '';
       console.error('[ForgotPassword] Reset failed:', raw);
       if (raw.includes('user-not-found') || raw.includes('invalid-email')) {
-        setLocalError('No account found with that email address.');
+        setLocalError(t('forgotPassword.noAccountFound'));
       } else if (raw.includes('too-many-requests')) {
-        setLocalError('Too many attempts. Please wait a moment and try again.');
+        setLocalError(t('forgotPassword.tooManyAttempts'));
       } else {
-        setLocalError('Failed to send reset email. Please try again.');
+        setLocalError(t('forgotPassword.sendFailed'));
       }
     }
   };
@@ -103,9 +105,9 @@ export default function ForgotPasswordScreen() {
               <View style={styles.iconWrap}>
                 <MaterialIcons name="lock-reset" size={48} color="#A78BFA" />
               </View>
-              <Text style={styles.title}>Reset password</Text>
+              <Text style={styles.title}>{t('forgotPassword.title')}</Text>
               <Text style={styles.subtitle}>
-                Enter your email and we&apos;ll send you a link to reset your password.
+                {t('forgotPassword.subtitle')}
               </Text>
             </View>
           </FadeInView>
@@ -122,7 +124,7 @@ export default function ForgotPasswordScreen() {
             <Animated.View style={[styles.successBanner, { opacity: fadeAnim }]}>
               <MaterialIcons name="check-circle" size={20} color="#6EE7B7" style={styles.successIcon} />
               <Text style={styles.successText}>
-                Reset email sent! Check your inbox (and spam folder) for a message from Firebase.
+                {t('forgotPassword.successMessage')}
               </Text>
             </Animated.View>
           ) : null}
@@ -130,10 +132,10 @@ export default function ForgotPasswordScreen() {
           {/* Form */}
           {!isSuccess ? (
             <Animated.View style={[styles.formCard, { opacity: fadeAnim }]}>
-              <Text style={styles.sectionLabel}>Your email address</Text>
+              <Text style={styles.sectionLabel}>{t('forgotPassword.emailLabel')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="hello@example.com"
+                placeholder={t('forgotPassword.emailPlaceholder')}
                 placeholderTextColor="rgba(255, 255, 255, 0.4)"
                 value={email}
                 onChangeText={setEmail}
@@ -156,7 +158,7 @@ export default function ForgotPasswordScreen() {
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Send reset email</Text>
+                  <Text style={styles.primaryButtonText}>{t('forgotPassword.sendReset')}</Text>
                 )}
               </TouchableOpacity>
             </Animated.View>
@@ -168,7 +170,7 @@ export default function ForgotPasswordScreen() {
                 onPress={() => router.replace('/login')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.primaryButtonText}>Back to sign in</Text>
+                <Text style={styles.primaryButtonText}>{t('forgotPassword.backToSignIn')}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -178,11 +180,11 @@ export default function ForgotPasswordScreen() {
             onPress={() => router.push('/login')}
             disabled={isLoading}
           >
-            <Text style={styles.loginLinkText}>Remembered it? Sign in</Text>
+            <Text style={styles.loginLinkText}>{t('forgotPassword.rememberedIt')}</Text>
           </TouchableOpacity>
 
           <Text style={styles.hint}>
-            The reset link expires after 1 hour. Powered by Firebase Auth.
+            {t('forgotPassword.hint')}
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>

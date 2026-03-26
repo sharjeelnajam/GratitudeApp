@@ -12,6 +12,7 @@ import { Text } from '@/shared/ui';
 import { useLiveRoom } from '@/features/rooms/hooks/useLiveRoom';
 import { fetchRooms } from '@/services/room';
 import type { RoomListItem } from '@/services/room';
+import { useTranslation } from 'react-i18next';
 
 const ROOM_NAME_MAP: Record<string, string> = {
   fireplace: 'Fireplace',
@@ -21,6 +22,7 @@ const ROOM_NAME_MAP: Record<string, string> = {
 };
 
 export default function LiveRoomScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { room: roomType, roomId: paramRoomId } = useLocalSearchParams<{
     room?: string;
@@ -65,7 +67,7 @@ export default function LiveRoomScreen() {
       end={{ x: 0, y: 1 }}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Guided Alignment Room</Text>
+        <Text style={styles.title}>{t('liveRoom.title')}</Text>
         <Text style={styles.subtitle}>
           {live.roomName ?? roomType ?? 'Connecting…'}
         </Text>
@@ -79,23 +81,23 @@ export default function LiveRoomScreen() {
         {live.isConnected && !live.isJoined ? (
           <View style={styles.statusRow}>
             <ActivityIndicator size="small" color="#A78BFA" />
-            <Text style={styles.statusText}>Joining room…</Text>
+            <Text style={styles.statusText}>{t('liveRoom.joiningRoom')}</Text>
           </View>
         ) : null}
 
         {live.isJoined ? (
           <View style={styles.statusBox}>
-            <Text style={styles.statusLabel}>Participants</Text>
+            <Text style={styles.statusLabel}>{t('liveRoom.participants')}</Text>
             <Text style={styles.participantCount}>{live.participantCount} / 7</Text>
             <Text style={styles.stateLabel}>
-              Session: {live.sessionState ?? '—'}
+              {t('liveRoom.session')}: {live.sessionState ?? '—'}
             </Text>
           </View>
         ) : null}
 
         {!selectedRoomId && rooms.length > 0 ? (
           <View style={styles.roomList}>
-            <Text style={styles.roomListTitle}>Select a room</Text>
+            <Text style={styles.roomListTitle}>{t('rooms.selectRoom')}</Text>
             {rooms.map((r) => (
               <TouchableOpacity
                 key={r.id}
@@ -116,7 +118,7 @@ export default function LiveRoomScreen() {
           onPress={handleLeave}
           activeOpacity={0.8}
         >
-          <Text style={styles.leaveButtonText}>Leave Room</Text>
+          <Text style={styles.leaveButtonText}>{t('liveRoom.leaveRoom')}</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>

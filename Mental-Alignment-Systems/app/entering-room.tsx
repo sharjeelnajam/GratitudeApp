@@ -12,6 +12,7 @@ import { Text } from '@/shared/ui';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useCallback } from 'react';
 import { DoorOpeningVideoBackground } from '@/features/rooms/components/DoorOpeningVideoBackground';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +21,7 @@ const LOGO_SIZE = Math.min(width * 0.55, 220);
 const VALID_ROOMS = ['fireplace', 'ocean', 'forest', 'nightSky'] as const;
 
 export default function EnteringRoomScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { room } = useLocalSearchParams<{ room?: string }>();
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -98,7 +100,7 @@ export default function EnteringRoomScreen() {
             />
           </View>
         </Animated.View>
-        <Text style={styles.subtitle}>Entering your space...</Text>
+        <Text style={styles.subtitle}>{t('rooms.enteringSpace')}</Text>
         </View>
       </DoorOpeningVideoBackground>
     </View>

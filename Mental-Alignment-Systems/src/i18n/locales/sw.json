@@ -1,0 +1,174 @@
+{
+  "common": {
+    "continue": "Endelea",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "back": "Rudi",
+    "next": "Ifuatayo",
+    "loading": "Inapakia...",
+    "error": "Kuna tatizo limetokea",
+    "retry": "Jaribu tena",
+    "ok": "Sawa",
+    "enter": "Ingia"
+  },
+  "welcome": {
+    "appTitle": "Gratitude Keeper",
+    "appSubtitle": "Hifadhi yako ya ustawi wa akili",
+    "appSubtext": "Nafasi salama.",
+    "title": "Karibu",
+    "subtitle": "Gusa hapa chini kuanza safari yako",
+    "enter": "Ingia"
+  },
+  "auth": {
+    "welcomeBack": "Karibu tena",
+    "signInSubtitle": "Ingia ili kuendelea na safari yako",
+    "emailAndPassword": "Barua pepe na nenosiri",
+    "emailPlaceholder": "Barua pepe",
+    "passwordPlaceholder": "Nenosiri (angalau herufi 4)",
+    "passwordPlaceholder6": "Nenosiri (angalau herufi 6)",
+    "confirmPasswordPlaceholder": "Thibitisha nenosiri",
+    "namePlaceholder": "Jina (si lazima)",
+    "forgotPassword": "Umesahau nenosiri?",
+    "signInWithEmail": "Ingia kwa barua pepe",
+    "orContinueWith": "au endelea na",
+    "noAccount": "Huna akaunti? Tengeneza moja",
+    "hasAccount": "Una akaunti tayari? Ingia",
+    "signInHint": "Ingia kupitia Firebase. Nenosiri lako halihifadhiwi kwenye kifaa.",
+    "signInFailed": "Kuingia kumeshindwa. Angalia barua pepe na nenosiri.",
+    "googleSignInFailed": "Kuingia kwa Google kumeshindwa",
+    "appleSetupRequired": "Kuingia kwa Apple kunahitaji usanidi wa ziada.",
+    "createAccount": "Tengeneza akaunti",
+    "joinSubtitle": "Jiunge na anza safari yako",
+    "signUpFailed": "Usajili umeshindwa",
+    "googleSignUpFailed": "Usajili wa Google umeshindwa",
+    "passwordsNoMatch": "Nenosiri hazilingani",
+    "passwordHint": "Nenosiri lako halihifadhiwi kwenye kifaa."
+  },
+  "forgotPassword": {
+    "title": "Weka upya nenosiri",
+    "subtitle": "Ingiza barua pepe yako na tutakutumia kiungo cha kuweka upya nenosiri.",
+    "emailLabel": "Anwani yako ya barua pepe",
+    "emailPlaceholder": "habari@mfano.com",
+    "sendReset": "Tuma barua pepe ya kuweka upya",
+    "backToSignIn": "Rudi kwenye kuingia",
+    "rememberedIt": "Umekumbuka? Ingia",
+    "successMessage": "Barua pepe ya kuweka upya imetumwa! Angalia kikasha chako (na folda ya barua taka).",
+    "hint": "Kiungo cha kuweka upya kinaisha baada ya saa 1. Imeendeshwa na Firebase Auth.",
+    "noAccountFound": "Hakuna akaunti iliyopatikana na anwani hiyo ya barua pepe.",
+    "tooManyAttempts": "Majaribio mengi sana. Tafadhali subiri kidogo na ujaribu tena.",
+    "sendFailed": "Imeshindwa kutuma barua pepe. Tafadhali jaribu tena."
+  },
+  "intro": {
+    "appName": "Gratitude Keeper",
+    "appSubtitle": "Hifadhi yako ya ustawi wa akili",
+    "yourJourney": "Safari yako",
+    "yourNote": "Maelezo yako",
+    "loadingAudio": "Inapakia...",
+    "pauseAudio": "Simamisha sauti",
+    "playAudio": "Cheza ujumbe wa sauti",
+    "cards": {
+      "neuroplasticity": {
+        "title": "Neuroplasticity",
+        "description": "Njia yetu inaunganisha upya ubongo wako, inafanya upya nishati yako, na inalingana na mdundo mpya wa ustawi."
+      },
+      "higherVibration": {
+        "title": "Mtetemo wa juu",
+        "description": "Imehamasishwa na mtetemo wa juu wa shukrani, kuunda njia mpya zinazoongoza kwenye amani, furaha, na uhuru wa hisia."
+      },
+      "personalGrowth": {
+        "title": "Ukuaji binafsi",
+        "description": "Imarisha kujiamini, washa msukumo, jenga ustahimilivu, na tengeneza mafanikio binafsi."
+      },
+      "mindfulPresence": {
+        "title": "Uwepo wa makini",
+        "description": "Nafasi ya utulivu ya uwepo na uratibu, ambapo unaweza kurudi bila shinikizo au matarajio."
+      }
+    }
+  },
+  "questions": {
+    "title": "Jiangalie mwenyewe",
+    "finishSentence": "Maliza sentensi",
+    "enterRooms": "Ingia kwenye vyumba",
+    "prompts": {
+      "1": "Ninahisi",
+      "2": "Ninatafuta",
+      "3": "Ninahitaji",
+      "4": "Ninawezaje",
+      "5": "Ninataka",
+      "6": "Sijui",
+      "7": "Unatarajia nini",
+      "8": "Unajua unachohisi"
+    }
+  },
+  "payment": {
+    "kicker": "Kabla ya kuingia",
+    "title": "Fungua chumba chako cha uratibu wa akili",
+    "subtitle": "Chagua njia salama ya malipo ili kuwezesha ufikiaji wako. Utaelekezwa kwenye malipo ya kuaminika na kurudi hapa moja kwa moja.",
+    "payWithPaypal": "Lipa kwa PayPal",
+    "paypalDescription": "Tumia salio lako la PayPal, akaunti ya benki, au kadi. Hutashiriki kamwe maelezo yako kamili ya kadi.",
+    "continueWithPaypal": "Endelea na PayPal",
+    "payWithSquare": "Lipa kwa Square",
+    "squareDescription": "Lipa kwa usalama kwa kadi yoyote kuu kupitia uzoefu wa malipo uliofichwa wa Square.",
+    "continueWithSquare": "Endelea na Square",
+    "footerHint": "Malipo yanashughulikiwa na PayPal au Square. Hatuhifadhi kamwe maelezo yako kamili ya kadi kwenye kifaa hiki.",
+    "errorTitle": "Kuna tatizo limetokea",
+    "paypalError": "Kuna tatizo na malipo ya PayPal."
+  },
+  "rooms": {
+    "title": "Vyumba",
+    "subtitle": "Chagua nafasi inayokubaliana nawe",
+    "fireplace": {
+      "name": "Moto wa nyumba",
+      "description": "Joto, starehe, kuimarisha",
+      "subtext": "Jioni au kufunga"
+    },
+    "ocean": {
+      "name": "Bahari",
+      "description": "Utulivu, amani, kutiririka",
+      "subtext": "Msongo, mabadiliko, upya"
+    },
+    "forest": {
+      "name": "Msitu",
+      "description": "Kuimarisha, asili, wazi",
+      "subtext": "Kuweka nia na mwelekeo"
+    },
+    "nightSky": {
+      "name": "Anga la usiku",
+      "description": "Kina, kutafakari, upana",
+      "subtext": "Kutafakari na kina"
+    },
+    "selectRoom": "Chagua chumba",
+    "enteringSpace": "Unaingia kwenye nafasi yako...",
+    "shareRoom": "Shiriki chumba",
+    "shareInviteMessage": "Jiunge nami katika nafasi hii kwenye Gratitude Keeper. Gusa kiungo hapa chini kwenye simu yako (sakinisha app ikiwa inahitajika):"
+  },
+  "alignment": {
+    "title": "Kipindi cha uratibu",
+    "description": "Nafasi ya uwepo na uratibu",
+    "infoText": "Hii ni nafasi ya uratibu wa ndani na uwepo. Chukua muda wako, hakuna haraka.",
+    "visitRoom": "Tembelea chumba"
+  },
+  "liveRoom": {
+    "title": "Chumba cha uratibu cha mwongozo",
+    "joiningRoom": "Inajiunga na chumba…",
+    "participants": "Washiriki",
+    "session": "Kipindi",
+    "leaveRoom": "Ondoka chumbani"
+  },
+  "close": {
+    "title": "Asante",
+    "message": "Jihadhari",
+    "returnHome": "Rudi nyumbani"
+  },
+  "settings": {
+    "title": "Mipangilio",
+    "language": "Lugha",
+    "selectLanguage": "Chagua lugha",
+    "signOut": "Toka"
+  },
+  "tabs": {
+    "home": "Nyumbani",
+    "rooms": "Vyumba",
+    "settings": "Mipangilio"
+  }
+}

@@ -16,7 +16,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { Text } from '@/shared/ui';
 import { createPayPalOrder, getSubscriptionStatus, activateSubscription } from '@/services/billing/billingService';
-import { SHOW_PAYMENT_ALWAYS } from '@/features/payments/config';
+import { useTranslation } from 'react-i18next';
+import { replaceWithPendingInviteOr } from '@/services/roomInvite/roomInviteLink';
 
 const { width } = Dimensions.get('window');
 const CARD_MAX_WIDTH = Math.min(width - 48, 420);
@@ -31,6 +32,7 @@ const SQUARE_LOGO_XML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48
 </svg>`;
 
 export default function PaymentScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export default function PaymentScreen() {
           const sub = await getSubscriptionStatus();
           if (sub.isActive) {
             console.log('[Payment] Subscription active after PayPal return');
-            router.replace('/welcome');
+            void replaceWithPendingInviteOr(router, '/home');
           }
         } catch {
           // Ignore — user can retry
@@ -59,11 +61,6 @@ export default function PaymentScreen() {
   const startPayPalCheckout = async () => {
     if (loadingProvider) return;
     setError(null);
-
-    if (SHOW_PAYMENT_ALWAYS) {
-      router.replace('/login');
-      return;
-    }
 
     setLoadingProvider('paypal');
     try {
@@ -79,14 +76,14 @@ export default function PaymentScreen() {
       // Browser dismissed — check if payment was completed
       const sub = await getSubscriptionStatus();
       if (sub.isActive) {
-        router.replace('/welcome');
+        void replaceWithPendingInviteOr(router, '/home');
       } else {
         pendingCheckRef.current = false;
       }
     } catch (e) {
       pendingCheckRef.current = false;
       const message =
-        e instanceof Error ? e.message : 'Something went wrong with PayPal checkout.';
+        e instanceof Error ? e.message : t('payment.paypalError');
       console.error('[Payment] PayPal error:', message);
       setError(message);
     } finally {
@@ -100,12 +97,11 @@ export default function PaymentScreen() {
     setLoadingProvider('square');
     try {
       await activateSubscription('square');
-      router.replace('/welcome');
     } catch {
-      // User may not be authenticated yet — send to login first
-      router.replace('/login');
+      // Ignore — demo shortcut
     } finally {
       setLoadingProvider(null);
+      void replaceWithPendingInviteOr(router, '/home');
     }
   };
 
@@ -120,11 +116,10 @@ export default function PaymentScreen() {
         <View style={styles.container}>
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={styles.kicker}>Before you enter</Text>
-              <Text style={styles.title}>Unlock your Mental Alignment room</Text>
+              <Text style={styles.kicker}>{t('payment.kicker')}</Text>
+              <Text style={styles.title}>{t('payment.title')}</Text>
               <Text style={styles.subtitle}>
-                Choose a secure payment method to activate your access. You&apos;ll be redirected
-                to a trusted checkout and brought back here automatically.
+                {t('payment.subtitle')}
               </Text>
             </View>
 
@@ -136,10 +131,9 @@ export default function PaymentScreen() {
                     <Text style={styles.pillTextDark}>PayPal</Text>
                   </View>
                 </View>
-                <Text style={styles.cardTitle}>Pay with PayPal</Text>
+                <Text style={styles.cardTitle}>{t('payment.payWithPaypal')}</Text>
                 <Text style={styles.cardBody}>
-                  Use your PayPal balance, bank account, or cards. You never share your full card
-                  details with us.
+                  {t('payment.paypalDescription')}
                 </Text>
                 <TouchableOpacity
                   style={[
@@ -153,7 +147,7 @@ export default function PaymentScreen() {
                   {loadingProvider === 'paypal' ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.ctaButtonText}>Continue with PayPal</Text>
+                    <Text style={styles.ctaButtonText}>{t('payment.continueWithPaypal')}</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -165,10 +159,9 @@ export default function PaymentScreen() {
                     <Text style={styles.pillTextDark}>Square</Text>
                   </View>
                 </View>
-                <Text style={styles.cardTitle}>Pay with Square</Text>
+                <Text style={styles.cardTitle}>{t('payment.payWithSquare')}</Text>
                 <Text style={styles.cardBody}>
-                  Pay securely with any major card through Square&apos;s encrypted checkout
-                  experience.
+                  {t('payment.squareDescription')}
                 </Text>
                 <TouchableOpacity
                   style={[
@@ -182,7 +175,7 @@ export default function PaymentScreen() {
                   {loadingProvider === 'square' ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.ctaButtonText}>Continue with Square</Text>
+                    <Text style={styles.ctaButtonText}>{t('payment.continueWithSquare')}</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -190,8 +183,7 @@ export default function PaymentScreen() {
           </View>
 
           <Text style={styles.footerHint}>
-            Payments are processed by PayPal or Square. We never store your full card details on
-            this device.
+            {t('payment.footerHint')}
           </Text>
         </View>
 
@@ -201,7 +193,7 @@ export default function PaymentScreen() {
             <View style={styles.errorModal}>
               <View style={styles.errorIconRow}>
                 <MaterialIcons name="error-outline" size={22} color="#F97373" />
-                <Text style={styles.errorTitle}>Something went wrong</Text>
+                <Text style={styles.errorTitle}>{t('payment.errorTitle')}</Text>
               </View>
               <Text style={styles.errorMessage}>{error}</Text>
               <TouchableOpacity
@@ -209,7 +201,7 @@ export default function PaymentScreen() {
                 onPress={() => setError(null)}
                 activeOpacity={0.9}
               >
-                <Text style={styles.errorButtonText}>OK</Text>
+                <Text style={styles.errorButtonText}>{t('common.ok')}</Text>
               </TouchableOpacity>
             </View>
           </View>

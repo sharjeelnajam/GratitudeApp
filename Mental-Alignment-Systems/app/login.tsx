@@ -21,15 +21,17 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Text, FadeInView } from '@/shared/ui';
+import { Text, FadeInView, LanguageSwitcher } from '@/shared/ui';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
 import { promptGoogleSignIn } from '@/services/auth';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = Math.min(width * 0.28, 100);
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signInEmail, loading: authLoading, isAuthenticated, error } = useAuthContext();
   const [email, setEmail] = useState('');
@@ -65,7 +67,7 @@ export default function LoginScreen() {
       await signInEmail(email.trim(), password);
       router.replace('/');
     } catch {
-      setLocalError('Sign in failed. Check email and password.');
+      setLocalError(t('auth.signInFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +81,7 @@ export default function LoginScreen() {
       await promptGoogleSignIn();
       router.replace('/');
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Google sign in failed';
+      const msg = e instanceof Error ? e.message : t('auth.googleSignInFailed');
       setLocalError(msg);
     } finally {
       setIsLoading(false);
@@ -87,7 +89,7 @@ export default function LoginScreen() {
   };
 
   const handleAppleLogin = () => {
-    setLocalError('Apple Sign-In requires additional setup.');
+    setLocalError(t('auth.appleSetupRequired'));
   };
 
   if (authLoading) {
@@ -140,8 +142,8 @@ export default function LoginScreen() {
                   />
                 )}
               </View>
-              <Text style={styles.title}>Welcome back</Text>
-              <Text style={styles.subtitle}>Sign in to continue your journey</Text>
+              <Text style={styles.title}>{t('auth.welcomeBack')}</Text>
+              <Text style={styles.subtitle}>{t('auth.signInSubtitle')}</Text>
             </View>
           </FadeInView>
 
@@ -152,10 +154,10 @@ export default function LoginScreen() {
           ) : null}
 
           <Animated.View style={[styles.formCard, { opacity: fadeAnim }]}>
-            <Text style={styles.sectionLabel}>Email & password</Text>
+            <Text style={styles.sectionLabel}>{t('auth.emailAndPassword')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder={t('auth.emailPlaceholder')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={email}
               onChangeText={setEmail}
@@ -166,7 +168,7 @@ export default function LoginScreen() {
             />
             <TextInput
               style={[styles.input, styles.inputLast]}
-              placeholder="Password (min 4 characters)"
+              placeholder={t('auth.passwordPlaceholder')}
               placeholderTextColor="rgba(255, 255, 255, 0.4)"
               value={password}
               onChangeText={setPassword}
@@ -178,7 +180,7 @@ export default function LoginScreen() {
               onPress={() => router.push('/forgot-password')}
               disabled={isLoading}
             >
-              <Text style={styles.forgotLinkText}>Forgot password?</Text>
+              <Text style={styles.forgotLinkText}>{t('auth.forgotPassword')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -192,14 +194,14 @@ export default function LoginScreen() {
               {isLoading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.primaryButtonText}>Sign in with Email</Text>
+                <Text style={styles.primaryButtonText}>{t('auth.signInWithEmail')}</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or continue with</Text>
+            <Text style={styles.dividerText}>{t('auth.orContinueWith')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -230,13 +232,15 @@ export default function LoginScreen() {
             disabled={isLoading}
           >
             <Text style={styles.signupLinkText}>
-              Don&apos;t have an account? Create one
+              {t('auth.noAccount')}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.hint}>
-            Sign in with Firebase. Your password is never stored locally.
+            {t('auth.signInHint')}
           </Text>
+
+          <LanguageSwitcher />
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>

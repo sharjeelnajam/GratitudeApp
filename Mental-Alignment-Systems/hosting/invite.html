@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0A0714" />
+  <title>Gratitude Keeper</title>
+  <style>
+    body { font-family: system-ui, sans-serif; text-align: center; padding: 2rem; background: #0A0714; color: #e8e8e8; margin: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+    a { color: #A78BFA; word-break: break-all; }
+    p { line-height: 1.5; max-width: 28rem; margin: 0.75rem auto; }
+  </style>
+</head>
+<body>
+  <p><strong>Opening Gratitude Keeper…</strong></p>
+  <p>If the app does not open, install Gratitude Keeper on this device, then tap the button below.</p>
+  <p><a id="open" href="#">Open in app</a></p>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var room = params.get('room') || 'fireplace';
+      var allowed = ['fireplace', 'ocean', 'forest', 'nightSky'];
+      if (allowed.indexOf(room) === -1) room = 'fireplace';
+      var scheme = params.get('scheme') || 'myapp';
+      if (!/^[a-z][a-z0-9+.-]*$/i.test(scheme)) scheme = 'myapp';
+      var deep = scheme + '://entering-room?room=' + encodeURIComponent(room);
+      var a = document.getElementById('open');
+      a.href = deep;
+      location.replace(deep);
+    })();
+  </script>
+</body>
+</html>

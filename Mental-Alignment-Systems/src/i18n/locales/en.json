@@ -1,0 +1,174 @@
+{
+  "common": {
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "ok": "OK",
+    "enter": "Enter"
+  },
+  "welcome": {
+    "appTitle": "Gratitude Keeper",
+    "appSubtitle": "Your Mental Wellness Sanctuary",
+    "appSubtext": "A safe space.",
+    "title": "Welcome",
+    "subtitle": "Tap below to begin your journey",
+    "enter": "Enter"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in to continue your journey",
+    "emailAndPassword": "Email & password",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password (min 4 characters)",
+    "passwordPlaceholder6": "Password (min 6 characters)",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "namePlaceholder": "Name (optional)",
+    "forgotPassword": "Forgot password?",
+    "signInWithEmail": "Sign in with Email",
+    "orContinueWith": "or continue with",
+    "noAccount": "Don't have an account? Create one",
+    "hasAccount": "Already have an account? Sign in",
+    "signInHint": "Sign in with Firebase. Your password is never stored locally.",
+    "signInFailed": "Sign in failed. Check email and password.",
+    "googleSignInFailed": "Google sign in failed",
+    "appleSetupRequired": "Apple Sign-In requires additional setup.",
+    "createAccount": "Create account",
+    "joinSubtitle": "Join and begin your journey",
+    "signUpFailed": "Sign up failed",
+    "googleSignUpFailed": "Google sign up failed",
+    "passwordsNoMatch": "Passwords do not match",
+    "passwordHint": "Your password is never stored locally."
+  },
+  "forgotPassword": {
+    "title": "Reset password",
+    "subtitle": "Enter your email and we'll send you a link to reset your password.",
+    "emailLabel": "Your email address",
+    "emailPlaceholder": "hello@example.com",
+    "sendReset": "Send reset email",
+    "backToSignIn": "Back to sign in",
+    "rememberedIt": "Remembered it? Sign in",
+    "successMessage": "Reset email sent! Check your inbox (and spam folder) for a message from Firebase.",
+    "hint": "The reset link expires after 1 hour. Powered by Firebase Auth.",
+    "noAccountFound": "No account found with that email address.",
+    "tooManyAttempts": "Too many attempts. Please wait a moment and try again.",
+    "sendFailed": "Failed to send reset email. Please try again."
+  },
+  "intro": {
+    "appName": "Gratitude Keeper",
+    "appSubtitle": "Your Mental Wellness Sanctuary",
+    "yourJourney": "Your Journey",
+    "yourNote": "Your Note",
+    "loadingAudio": "Loading...",
+    "pauseAudio": "Pause Audio",
+    "playAudio": "Play Audio Message",
+    "cards": {
+      "neuroplasticity": {
+        "title": "Neuroplasticity",
+        "description": "Our approach rewires your brain, renews your energy, and aligns with a new rhythm of wellbeing."
+      },
+      "higherVibration": {
+        "title": "Higher Vibration",
+        "description": "Inspired by the higher vibration of gratitude, creating new pathways that lead to peace, joy, and emotional freedom."
+      },
+      "personalGrowth": {
+        "title": "Personal Growth",
+        "description": "Strengthen self-confidence, ignite inspiration, build resilience, and create personal breakthroughs."
+      },
+      "mindfulPresence": {
+        "title": "Mindful Presence",
+        "description": "A calm space for presence and alignment, where you can return without pressure or expectations."
+      }
+    }
+  },
+  "questions": {
+    "title": "Check in with yourself",
+    "finishSentence": "Finish the sentence",
+    "enterRooms": "Enter Rooms",
+    "prompts": {
+      "1": "I feel",
+      "2": "I am searching for",
+      "3": "I need",
+      "4": "How can I",
+      "5": "I want",
+      "6": "I don't know",
+      "7": "What are you hoping for",
+      "8": "Do you know what you are feeling"
+    }
+  },
+  "payment": {
+    "kicker": "Before you enter",
+    "title": "Unlock your Mental Alignment room",
+    "subtitle": "Choose a secure payment method to activate your access. You'll be redirected to a trusted checkout and brought back here automatically.",
+    "payWithPaypal": "Pay with PayPal",
+    "paypalDescription": "Use your PayPal balance, bank account, or cards. You never share your full card details with us.",
+    "continueWithPaypal": "Continue with PayPal",
+    "payWithSquare": "Pay with Square",
+    "squareDescription": "Pay securely with any major card through Square's encrypted checkout experience.",
+    "continueWithSquare": "Continue with Square",
+    "footerHint": "Payments are processed by PayPal or Square. We never store your full card details on this device.",
+    "errorTitle": "Something went wrong",
+    "paypalError": "Something went wrong with PayPal checkout."
+  },
+  "rooms": {
+    "title": "Rooms",
+    "subtitle": "Choose a space that resonates with you",
+    "fireplace": {
+      "name": "Fireplace",
+      "description": "Warm, cozy, grounding",
+      "subtext": "Evening or closure"
+    },
+    "ocean": {
+      "name": "Ocean",
+      "description": "Calm, serene, flowing",
+      "subtext": "Stress, transitions, resets"
+    },
+    "forest": {
+      "name": "Forest",
+      "description": "Grounding, natural, clear",
+      "subtext": "Intention-setting and direction"
+    },
+    "nightSky": {
+      "name": "Night Sky",
+      "description": "Deep, contemplative, vast",
+      "subtext": "Reflection and depth"
+    },
+    "selectRoom": "Select a room",
+    "enteringSpace": "Entering your space...",
+    "shareRoom": "Share room",
+    "shareInviteMessage": "Join me in this space in Gratitude Keeper. Tap the link below on your phone (install the app if needed):"
+  },
+  "alignment": {
+    "title": "Alignment Session",
+    "description": "A space for presence and alignment",
+    "infoText": "This is a space for inner alignment and presence. Take your time, there's no rush.",
+    "visitRoom": "Visit a Room"
+  },
+  "liveRoom": {
+    "title": "Guided Alignment Room",
+    "joiningRoom": "Joining room…",
+    "participants": "Participants",
+    "session": "Session",
+    "leaveRoom": "Leave Room"
+  },
+  "close": {
+    "title": "Thank you",
+    "message": "Take care",
+    "returnHome": "Return Home"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "signOut": "Sign Out"
+  },
+  "tabs": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "settings": "Settings"
+  }
+}

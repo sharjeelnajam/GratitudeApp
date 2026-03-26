@@ -9,8 +9,10 @@ import { View, StyleSheet } from 'react-native';
 import { AmbientBackground, Container, Text, FadeInView, Button } from '@/shared/ui';
 import { useTheme } from '@/theme';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function QuietClosingScreen() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -24,10 +26,10 @@ export default function QuietClosingScreen() {
         <FadeInView duration={theme.motion.animations.fadeIn.duration} delay={200}>
           <View style={styles.content}>
             <Text variant="h2" style={styles.title}>
-              Thank you
+              {t('close.title')}
             </Text>
             <Text variant="contemplative" color="secondary" style={styles.message}>
-              Take care
+              {t('close.message')}
             </Text>
 
             <View style={styles.actions}>
@@ -37,7 +39,7 @@ export default function QuietClosingScreen() {
                 onPress={() => router.push('/')}
                 style={styles.button}
               >
-                Return Home
+                {t('close.returnHome')}
               </Button>
             </View>
             {/* TODO: Add gentle closing content */}

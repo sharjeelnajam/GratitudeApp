@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const HORIZONTAL_PADDING = 20;
@@ -24,10 +25,10 @@ interface IntroCard {
   icon: keyof typeof MaterialIcons.glyphMap;
   iconColor: string;
   iconBgColor: string;
-  title: string;
+  titleKey: string;
   date: string;
   rating: string;
-  description: string;
+  descriptionKey: string;
 }
 
 const INTRO_CARDS: IntroCard[] = [
@@ -36,46 +37,47 @@ const INTRO_CARDS: IntroCard[] = [
     icon: 'psychology',
     iconColor: '#FFFFFF',
     iconBgColor: '#06B6D4',
-    title: 'Neuroplasticity',
+    titleKey: 'intro.cards.neuroplasticity.title',
     date: '24 June 2024',
     rating: '8.9/10',
-    description: 'Our approach rewires your brain, renews your energy, and aligns with a new rhythm of wellbeing.',
+    descriptionKey: 'intro.cards.neuroplasticity.description',
   },
   {
     id: '2',
     icon: 'favorite',
     iconColor: '#FFFFFF',
     iconBgColor: '#EC4899',
-    title: 'Higher Vibration',
+    titleKey: 'intro.cards.higherVibration.title',
     date: '07 Aug 2024',
     rating: '7.9/10',
-    description: 'Inspired by the higher vibration of gratitude, creating new pathways that lead to peace, joy, and emotional freedom.',
+    descriptionKey: 'intro.cards.higherVibration.description',
   },
   {
     id: '3',
     icon: 'auto-awesome',
     iconColor: '#FFFFFF',
     iconBgColor: '#8B5CF6',
-    title: 'Personal Growth',
+    titleKey: 'intro.cards.personalGrowth.title',
     date: '15 Sep 2024',
     rating: '9.2/10',
-    description: 'Strengthen self-confidence, ignite inspiration, build resilience, and create personal breakthroughs.',
+    descriptionKey: 'intro.cards.personalGrowth.description',
   },
   {
     id: '4',
     icon: 'spa',
     iconColor: '#FFFFFF',
     iconBgColor: '#10B981',
-    title: 'Mindful Presence',
+    titleKey: 'intro.cards.mindfulPresence.title',
     date: '22 Oct 2024',
     rating: '8.5/10',
-    description: 'A calm space for presence and alignment, where you can return without pressure or expectations.',
+    descriptionKey: 'intro.cards.mindfulPresence.description',
   },
 ];
 
 const INTRO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
 export default function IntroScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const player = useAudioPlayer(INTRO_AUDIO_URL, { downloadFirst: true });
   const status = useAudioPlayerStatus(player);
@@ -140,8 +142,8 @@ export default function IntroScreen() {
             </View>
 
             {/* App Name */}
-            <Text style={styles.appName}>Gratitude Keeper</Text>
-            <Text style={styles.appSubtitle}>Your Mental Wellness Sanctuary</Text>
+            <Text style={styles.appName}>{t('intro.appName')}</Text>
+            <Text style={styles.appSubtitle}>{t('intro.appSubtitle')}</Text>
           </View>
         </FadeInView>
       </View>
@@ -151,7 +153,7 @@ export default function IntroScreen() {
         <View style={styles.cardsSection}>
           <FadeInView duration={800} delay={400}>
             <View style={styles.historyHeader}>
-              <Text style={styles.historyTitle}>Your Journey</Text>
+              <Text style={styles.historyTitle}>{t('intro.yourJourney')}</Text>
             </View>
           </FadeInView>
 
@@ -193,7 +195,7 @@ export default function IntroScreen() {
                       <MaterialIcons name={card.icon} size={24} color={card.iconColor} />
                     </View>
                     <View style={styles.cardHeaderText}>
-                      <Text style={styles.cardTitle}>{card.title}</Text>
+                      <Text style={styles.cardTitle}>{t(card.titleKey)}</Text>
                       <Text style={styles.cardDate}>{card.date}</Text>
                     </View>
                     <View style={styles.ratingBadge}>
@@ -203,8 +205,8 @@ export default function IntroScreen() {
 
                   {/* Your Note Section */}
                   <View style={styles.noteSection}>
-                    <Text style={styles.noteLabel}>Your Note</Text>
-                    <Text style={styles.noteText}>{card.description}</Text>
+                    <Text style={styles.noteLabel}>{t('intro.yourNote')}</Text>
+                    <Text style={styles.noteText}>{t(card.descriptionKey)}</Text>
                   </View>
                 </View>
               </View>
@@ -266,7 +268,7 @@ export default function IntroScreen() {
                   <MaterialIcons name="play-arrow" size={20} color="#8B5CF6" />
                 )}
                 <Text style={styles.audioButtonText}>
-                  {isLoading ? 'Loading...' : isPlaying ? 'Pause Audio' : 'Play Audio Message'}
+                  {isLoading ? t('intro.loadingAudio') : isPlaying ? t('intro.pauseAudio') : t('intro.playAudio')}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -281,7 +283,7 @@ export default function IntroScreen() {
               style={styles.continueButton}
               activeOpacity={0.6}
             >
-              <Text style={styles.continueButtonText}>Continue</Text>
+              <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
             </TouchableOpacity>
           </View>
         </FadeInView>

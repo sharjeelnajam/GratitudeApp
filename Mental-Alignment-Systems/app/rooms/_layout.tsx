@@ -1,6 +1,6 @@
 /**
  * Rooms Layout
- * Wraps room screens with UserHeader.
+ * Wraps room session screens with UserHeader.
  */
 
 import { Stack } from 'expo-router';
@@ -16,7 +16,6 @@ export default function RoomsLayout() {
         headerBackground: () => null,
       }}
     >
-      <Stack.Screen name="index" />
       <Stack.Screen name="[roomType]" />
     </Stack>
   );
