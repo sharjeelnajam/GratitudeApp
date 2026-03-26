@@ -15,6 +15,7 @@ import { Intention } from '@/domain';
 export enum RoomSessionState {
   BREATHING_ACTIVITY = 'breathing_activity', // 32s breathe/hold circular activity
   BODY_AWARENESS_AUDIO = 'body_awareness_audio', // 10 min Body Awareness message player
+  ROOM_ENTRY_NOTE = 'room_entry_note', // short calming note before cards
   RELAXATION_CARDS = 'relaxation_cards', // 5 flip cards with relaxation messages
   ARRIVAL = 'arrival', // Arrival & Stillness
   REFLECTION_QUESTIONS = 'reflection_questions', // Room reflection questions

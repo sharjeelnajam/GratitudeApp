@@ -58,6 +58,7 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
     progress.setValue(0);
     const isBreathingIn = phase?.key === 'in';
     const isBreathingOut = phase?.key === 'out';
+    const isHoldPhase = phase?.key === 'hold1' || phase?.key === 'hold2';
 
     if (isBreathingIn) {
       Animated.timing(pulseScale, {
@@ -77,13 +78,19 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
       pulseScale.setValue(1);
     }
 
-    progressAnimRef.current = Animated.timing(progress, {
-      toValue: 1,
-      duration: PHASE_DURATION_MS,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    });
-    progressAnimRef.current.start();
+    if (isHoldPhase) {
+      // Keep the ring static during HOLD to avoid visual confusion.
+      progress.setValue(1);
+      progressAnimRef.current = null;
+    } else {
+      progressAnimRef.current = Animated.timing(progress, {
+        toValue: 1,
+        duration: PHASE_DURATION_MS,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      });
+      progressAnimRef.current.start();
+    }
 
     timerRef.current = setTimeout(() => {
       if (isLastPhase) {

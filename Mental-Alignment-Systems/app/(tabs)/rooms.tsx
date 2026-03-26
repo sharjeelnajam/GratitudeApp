@@ -4,25 +4,27 @@
  * Displays all available guided alignment rooms in a horizontal carousel.
  */
 
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text, FadeInView } from '@/shared/ui';
-import { ShareRoomButton } from '@/features/rooms/components/ShareRoomButton';
 import { useRouter } from 'expo-router';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 const CARD_SPACING = 20;
 const CARD_WIDTH = width - 80;
 const CARD_HEIGHT = Math.min(height * 0.55, 400);
+const CARD_PARTICLE_COUNT = 14;
 
 export default function RoomsTab() {
   const { t } = useTranslation();
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const auraRotation = useRef(new Animated.Value(0)).current;
+  const titleGlow = useRef(new Animated.Value(0.35)).current;
 
   const rooms = [
     {
@@ -50,6 +52,67 @@ export default function RoomsTab() {
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { x: scrollX } } }],
     { useNativeDriver: false }
+  );
+
+  useEffect(() => {
+    const rotationLoop = Animated.loop(
+      Animated.timing(auraRotation, {
+        toValue: 1,
+        duration: 14000,
+        useNativeDriver: true,
+      })
+    );
+
+    const titlePulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(titleGlow, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleGlow, {
+          toValue: 0.45,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    rotationLoop.start();
+    titlePulseLoop.start();
+
+    return () => {
+      rotationLoop.stop();
+      titlePulseLoop.stop();
+    };
+  }, [auraRotation, titleGlow]);
+
+  const auraRotationInterpolate = auraRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const cardParticles = useMemo(
+    () => {
+      const ringWidth = CARD_WIDTH - 20;
+      const ringHeight = CARD_HEIGHT - 20;
+      const centerX = ringWidth / 2;
+      const centerY = ringHeight / 2;
+      const radiusX = ringWidth / 2 - 8;
+      const radiusY = ringHeight / 2 - 8;
+
+      return Array.from({ length: CARD_PARTICLE_COUNT }, (_, i) => {
+        const angle = (i / CARD_PARTICLE_COUNT) * 2 * Math.PI;
+        return {
+          key: `p-${i}`,
+          style: {
+            left: centerX + radiusX * Math.cos(angle),
+            top: centerY + radiusY * Math.sin(angle),
+          },
+        };
+      });
+    },
+    []
   );
 
   return (
@@ -100,12 +163,66 @@ export default function RoomsTab() {
                     ]}
                   >
                     <View style={[styles.roomCard, styles[`${room.id}Card` as keyof typeof styles]]}>
+                      {(room.id === 'fireplace' || room.id === 'ocean') && (
+                        <View pointerEvents="none" style={styles.cardGifOverlay}>
+                          <Image
+                            source={
+                              room.id === 'fireplace'
+                                ? require('../../assets/gif/fire.gif')
+                                : require('../../assets/gif/sea-ocean.gif')
+                            }
+                            style={styles.cardGif}
+                            resizeMode="cover"
+                          />
+                        </View>
+                      )}
+
+                      <Animated.View
+                        pointerEvents="none"
+                        style={[
+                          styles.cardAuraRing,
+                          {
+                            opacity: titleGlow.interpolate({
+                              inputRange: [0.35, 1],
+                              outputRange: [0.25, 0.9],
+                            }),
+                            transform: [{ rotate: auraRotationInterpolate }],
+                          },
+                        ]}
+                      >
+                        {room.id !== 'fireplace' && room.id !== 'ocean' && cardParticles.map((particle) => (
+                          <View
+                            key={`${room.id}-${particle.key}`}
+                            style={[
+                              styles.auraParticle,
+                              {
+                                ...particle.style,
+                                backgroundColor: room.iconColor,
+                                shadowColor: room.iconColor,
+                              },
+                            ]}
+                          />
+                        ))}
+                      </Animated.View>
+
                       <View style={styles.roomCardHeader}>
                         <View style={[styles.roomIcon, styles[`${room.id}Icon` as keyof typeof styles]]}>
                           <MaterialIcons name={room.icon} size={28} color={room.iconColor} />
                         </View>
-                        <Text style={styles.roomTitle}>{t(`rooms.${room.id}.name`)}</Text>
-                        <ShareRoomButton roomType={room.id} style={styles.shareOnCard} size={20} />
+                        <Animated.View style={{ opacity: titleGlow }}>
+                          <Text
+                            style={StyleSheet.flatten([
+                              styles.roomTitle,
+                              {
+                                textShadowColor: room.iconColor,
+                                textShadowRadius: 12,
+                                textShadowOffset: { width: 0, height: 0 },
+                              },
+                            ])}
+                          >
+                            {t(`rooms.${room.id}.name`)}
+                          </Text>
+                        </Animated.View>
                       </View>
                       <Text style={styles.roomDescription}>{t(`rooms.${room.id}.description`)}</Text>
                       <Text style={styles.roomSubtext}>{t(`rooms.${room.id}.subtext`)}</Text>
@@ -130,7 +247,7 @@ export default function RoomsTab() {
               </ScrollView>
 
               <View style={styles.paginationContainer}>
-                {rooms.map((_, index) => {
+                {rooms.map((room, index) => {
                   const inputRange = [
                     (index - 1) * (CARD_WIDTH + CARD_SPACING),
                     index * (CARD_WIDTH + CARD_SPACING),
@@ -151,7 +268,7 @@ export default function RoomsTab() {
 
                   return (
                     <Animated.View
-                      key={index}
+                      key={`dot-${room.id}`}
                       style={[
                         styles.paginationDot,
                         {
@@ -197,6 +314,7 @@ const styles = StyleSheet.create({
   carouselContent: { paddingVertical: 16, paddingBottom: 24 },
   cardWrapper: {},
   roomCard: {
+    position: 'relative',
     borderRadius: 24,
     padding: 28,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -210,6 +328,33 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     maxHeight: CARD_HEIGHT,
     justifyContent: 'space-between',
+    overflow: 'hidden',
+  },
+  cardGifOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.35,
+  },
+  cardGif: {
+    width: '100%',
+    height: '100%',
+  },
+  cardAuraRing: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    bottom: 10,
+    left: 10,
+    borderRadius: 20,
+  },
+  auraParticle: {
+    position: 'absolute',
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 6,
+    elevation: 3,
   },
   fireplaceCard: { borderLeftWidth: 4, borderLeftColor: 'rgba(245, 158, 11, 0.6)', shadowColor: '#F59E0B' },
   oceanCard: { borderLeftWidth: 4, borderLeftColor: 'rgba(6, 182, 212, 0.6)', shadowColor: '#06B6D4' },

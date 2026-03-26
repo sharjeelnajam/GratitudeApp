@@ -33,6 +33,7 @@ export { createMockRoomSession, MOCK_CARDS, MOCK_PARTICIPANTS } from './mockData
 export { RoomSessionFlow } from './components/RoomSessionFlow';
 export { ArrivalPhase } from './components/ArrivalPhase';
 export { BreathingPhase } from './components/BreathingPhase';
+export { RoomEntryNotePhase } from './components/RoomEntryNotePhase';
 export { IntentionSettingPhase } from './components/IntentionSettingPhase';
 export { CardSelectionPhase } from './components/CardSelectionPhase';
 export { SharingPhase } from './components/SharingPhase';

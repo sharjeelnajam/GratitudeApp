@@ -4,7 +4,15 @@
     "slug": "mental-alignment-systems",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/geometry.jpeg",
+    "splash": {
+      "image": "./assets/images/geometry.jpeg",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0714",
+      "dark": {
+        "backgroundColor": "#0A0714"
+      }
+    },
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,10 +24,9 @@
         "android.permission.HIGH_SAMPLING_RATE_SENSORS"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#0A0714",
+        "foregroundImage": "./assets/images/geometry.jpeg",
+        "monochromeImage": "./assets/images/geometry.jpeg"
       },
       "backgroundColor": "#0A0714",
       "edgeToEdgeEnabled": true,
@@ -36,7 +43,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/geometry.jpeg",
-          "imageWidth": 240,
+          "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#0A0714",
           "dark": {

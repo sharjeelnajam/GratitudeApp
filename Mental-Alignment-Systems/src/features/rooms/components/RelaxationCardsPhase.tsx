@@ -16,16 +16,23 @@ import {
   Dimensions,
   Text as RNText,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { FadeInView, CardEnterView } from '@/shared/ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 const CARD_GAP = 14;
-// Single large card that fits comfortably within the screen
-const CARD_WIDTH = width - 48; // match horizontal padding from scrollContent
-const CARD_HEIGHT = Math.min(height * 0.55, 420);
+const GRID_COLUMNS = 2;
+const GRID_HORIZONTAL_PADDING = 24;
+const GRID_AVAILABLE_WIDTH = width - GRID_HORIZONTAL_PADDING * 2 - CARD_GAP;
+const CARD_WIDTH = GRID_AVAILABLE_WIDTH / GRID_COLUMNS;
+const CARD_HEIGHT = Math.min(height * 0.26, 220);
+const EXPANDED_CARD_WIDTH = width - 40;
+const EXPANDED_CARD_HEIGHT = Math.min(height * 0.72, 560);
 
 interface CardData {
   id: string;
@@ -80,9 +87,13 @@ const GLOW_CYCLE_MS = 2400;
 function FlipCard({
   card,
   index,
+  expanded = false,
+  showBackOnly = false,
 }: {
   card: CardData;
   index: number;
+  expanded?: boolean;
+  showBackOnly?: boolean;
 }) {
   const flipAnim = useRef(new Animated.Value(0)).current;
   const glowAnim = useRef(new Animated.Value(0.08)).current;
@@ -135,11 +146,29 @@ function FlipCard({
 
   const cardImageSource = card.imageGif ?? card.image;
 
+  if (showBackOnly) {
+    return (
+      <View style={styles.cardTouchExpanded}>
+        <View style={styles.cardOuter}>
+          <View style={[styles.cardFace, styles.cardBack]}>
+            <View style={styles.cardBackInner}>
+              <RNText style={styles.cardLabelExpanded}>{card.label}</RNText>
+              <RNText style={styles.cardMessageExpanded}>{card.message}</RNText>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <TouchableOpacity
       activeOpacity={1}
       onPress={handlePress}
-      style={[styles.cardTouch, index === 4 && styles.cardTouchSingle]}
+      style={[
+        expanded ? styles.cardTouchExpanded : styles.cardTouch,
+        !expanded && index === 4 && styles.cardTouchSingle,
+      ]}
     >
       <View style={styles.cardOuter}>
         <Animated.View
@@ -195,34 +224,42 @@ function FlipCard({
 }
 
 export function RelaxationCardsPhase({ onComplete }: RelaxationCardsPhaseProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-  const [nextIndex, setNextIndex] = useState(0);
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [expandedCard, setExpandedCard] = useState<CardData | null>(null);
+  const expandAnim = useRef(new Animated.Value(0)).current;
+  const frostSlide = useRef(new Animated.Value(0)).current;
+  const frostPulse = useRef(new Animated.Value(0.7)).current;
 
-  const goPrev = () => {
-    if (isExiting) return;
-    const target = Math.max(0, currentIndex - 1);
-    if (target === currentIndex) return;
-    setNextIndex(target);
-    setIsExiting(true);
-  };
+  useEffect(() => {
+    Animated.timing(expandAnim, {
+      toValue: expandedCard ? 1 : 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [expandAnim, expandedCard]);
 
-  const goNext = () => {
-    if (isExiting) return;
-    const target = Math.min(CARDS.length - 1, currentIndex + 1);
-    if (target === currentIndex) return;
-    setNextIndex(target);
-    setIsExiting(true);
-  };
-
-  const handleFlavourExitComplete = () => {
-    setCurrentIndex(nextIndex);
-    setIsExiting(false);
-  };
-
-  const isFirst = currentIndex === 0;
-  const isLast = currentIndex === CARDS.length - 1;
-  const currentCard = CARDS[currentIndex];
+  useEffect(() => {
+    const slideLoop = Animated.loop(
+      Animated.timing(frostSlide, {
+        toValue: 1,
+        duration: 2400,
+        useNativeDriver: true,
+      })
+    );
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(frostPulse, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        Animated.timing(frostPulse, { toValue: 0.7, duration: 1000, useNativeDriver: true }),
+      ])
+    );
+    slideLoop.start();
+    pulseLoop.start();
+    return () => {
+      slideLoop.stop();
+      pulseLoop.stop();
+    };
+  }, [frostPulse, frostSlide]);
 
   return (
     <View style={styles.container}>
@@ -242,41 +279,111 @@ export function RelaxationCardsPhase({ onComplete }: RelaxationCardsPhaseProps) 
           <RNText style={styles.subtitle}>Tap the card to reveal a gentle reminder</RNText>
 
           <View style={styles.grid}>
-            <CardEnterView
-              key={currentCard.id}
-              exit={isExiting}
-              onExitComplete={isExiting ? handleFlavourExitComplete : undefined}
-              duration={400}
-            >
-              <FlipCard card={currentCard} index={currentIndex} />
-            </CardEnterView>
-          </View>
-
-          <View style={styles.carouselControls}>
-            <TouchableOpacity
-              onPress={goPrev}
-              disabled={isFirst}
-              style={[styles.arrowButton, isFirst && styles.arrowButtonDisabled]}
-              activeOpacity={0.8}
-            >
-              <MaterialIcons name="chevron-left" size={28} color="#FFFFFF" />
-            </TouchableOpacity>
-
-            <RNText style={styles.cardCounter}>
-              {currentIndex + 1} / {CARDS.length}
-            </RNText>
-
-            <TouchableOpacity
-              onPress={goNext}
-              disabled={isLast}
-              style={[styles.arrowButton, isLast && styles.arrowButtonDisabled]}
-              activeOpacity={0.8}
-            >
-              <MaterialIcons name="chevron-right" size={28} color="#FFFFFF" />
-            </TouchableOpacity>
+            {CARDS.map((card, index) => (
+              <CardEnterView key={card.id} duration={400 + index * 50}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => setExpandedCard(card)}
+                  style={[styles.cardTouch, index === 4 && styles.cardTouchSingle]}
+                >
+                  <View style={styles.cardOuter}>
+                    <View style={[styles.cardFace, styles.cardFront]}>
+                      <View style={styles.cardImageWrap}>
+                        <Image source={card.imageGif ?? card.image} style={styles.cardImage} resizeMode="cover" />
+                      </View>
+                      <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.5)']}
+                        style={StyleSheet.absoluteFill}
+                      />
+                      <View style={styles.cardLabelWrap}>
+                        <RNText style={styles.cardLabel} numberOfLines={1}>
+                          {card.label}
+                        </RNText>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </CardEnterView>
+            ))}
           </View>
         </ScrollView>
       </FadeInView>
+
+      {expandedCard && (
+        <Animated.View
+          style={[
+            styles.expandedOverlay,
+            {
+              opacity: expandAnim,
+            },
+          ]}
+        >
+          <Pressable style={styles.expandedBackdrop} onPress={() => setExpandedCard(null)} />
+          <Animated.View
+            style={[
+              styles.expandedContent,
+              {
+                transform: [
+                  {
+                    scale: expandAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.88, 1],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <FlipCard card={expandedCard} index={0} expanded showBackOnly />
+            <View
+              style={[
+                styles.expandedActions,
+                { paddingBottom: Math.max(insets.bottom, 12) },
+              ]}
+            >
+              <TouchableOpacity
+                style={[styles.actionButton, styles.exitButton]}
+                onPress={() => {
+                  onComplete();
+                  setExpandedCard(null);
+                  router.replace('/(tabs)/home');
+                }}
+                activeOpacity={0.85}
+              >
+                <RNText style={styles.actionButtonText}>Exit Room</RNText>
+              </TouchableOpacity>
+              <Animated.View style={[styles.actionButton, styles.oceanButton, { transform: [{ scale: frostPulse }] }]}>
+                <Animated.View
+                  pointerEvents="none"
+                  style={[
+                    styles.oceanFrostOverlay,
+                    {
+                      transform: [
+                        {
+                          translateX: frostSlide.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [-80, 120],
+                          }),
+                        },
+                        { rotate: '-18deg' },
+                      ],
+                    },
+                  ]}
+                />
+                <TouchableOpacity
+                  style={styles.oceanButtonTouch}
+                  onPress={() => router.push('/entering-room?room=ocean')}
+                  activeOpacity={0.85}
+                >
+                  <RNText style={styles.oceanEmoji}>❄</RNText>
+                  <RNText style={styles.actionButtonText}>Go to Ocean Room</RNText>
+                  <RNText style={styles.oceanEmoji}>❄</RNText>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -315,7 +422,9 @@ const styles = StyleSheet.create({
   },
   grid: {
     width: '100%',
-    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginBottom: CARD_GAP,
   },
   cardTouch: {
@@ -324,8 +433,13 @@ const styles = StyleSheet.create({
     marginBottom: CARD_GAP,
   },
   cardTouchSingle: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    width: '100%',
+    height: Math.min(height * 0.28, 240),
+  },
+  cardTouchExpanded: {
+    width: EXPANDED_CARD_WIDTH,
+    height: EXPANDED_CARD_HEIGHT,
+    marginBottom: 12,
   },
   singleRow: {
     width: '100%',
@@ -407,28 +521,106 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlign: 'center',
   },
-  carouselControls: {
-    marginTop: 16,
+  cardLabelExpanded: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  cardMessageExpanded: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.95)',
+    lineHeight: 30,
+    textAlign: 'center',
+  },
+  continueButton: {
+    width: '100%',
+    minHeight: 50,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.45)',
+    backgroundColor: 'rgba(139, 92, 246, 0.16)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  continueButtonText: {
+    color: '#8B5CF6',
+    fontSize: 16,
+    fontWeight: '500',
+    letterSpacing: 0.6,
+  },
+  expandedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  expandedBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  expandedContent: {
+    width: EXPANDED_CARD_WIDTH,
+    alignItems: 'center',
+  },
+  expandedActions: {
+    width: '100%',
+    marginTop: 4,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  actionButton: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 10,
+    borderWidth: 1.2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+  },
+  exitButton: {
+    borderColor: 'rgba(239, 68, 68, 0.45)',
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+  },
+  oceanButton: {
+    borderColor: 'rgba(56, 189, 248, 0.45)',
+    backgroundColor: 'rgba(56, 189, 248, 0.2)',
+    overflow: 'hidden',
+  },
+  oceanButtonTouch: {
+    width: '100%',
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 32,
+    gap: 6,
+    borderRadius: 10,
   },
-  arrowButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  oceanFrostOverlay: {
+    position: 'absolute',
+    top: -8,
+    bottom: -8,
+    width: 64,
+    backgroundColor: 'rgba(224, 242, 254, 0.33)',
+    shadowColor: '#E0F2FE',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.85,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  arrowButtonDisabled: {
-    opacity: 0.35,
+  oceanEmoji: {
+    color: '#E0F2FE',
+    fontSize: 12,
   },
-  cardCounter: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.85)',
+  actionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    textAlign: 'center',
   },
 });

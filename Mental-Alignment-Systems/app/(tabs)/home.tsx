@@ -331,6 +331,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
     marginBottom: 8,
     letterSpacing: 2,
+    textAlign: 'center',
   },
   appSubtitle: { fontSize: 18, color: 'rgba(255, 255, 255, 0.8)', marginBottom: 4, fontWeight: '400' },
   appSubtext: { fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', fontStyle: 'italic' },

@@ -15,6 +15,7 @@ import { LiveEffectVideoBackground } from './LiveEffectVideoBackground';
 import { FireRoomParallaxBackground } from './FireRoomParallaxBackground';
 import { BreathingActivityPhase } from './BreathingActivityPhase';
 import { BodyAwarenessPlayerPhase } from './BodyAwarenessPlayerPhase';
+import { RoomEntryNotePhase } from './RoomEntryNotePhase';
 import { RelaxationCardsPhase } from './RelaxationCardsPhase';
 import { ArrivalPhase } from './ArrivalPhase';
 import { ReflectionQuestionsPhase } from './ReflectionQuestionsPhase';
@@ -81,6 +82,10 @@ export function RoomSessionFlow({
   };
 
   const handleBodyAwarenessComplete = () => {
+    handleStateChange('room_entry_note');
+  };
+
+  const handleRoomEntryNoteComplete = () => {
     handleStateChange('relaxation_cards');
   };
 
@@ -144,6 +149,9 @@ export function RoomSessionFlow({
 
       case 'body_awareness_audio':
         return <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />;
+
+      case 'room_entry_note':
+        return <RoomEntryNotePhase onComplete={handleRoomEntryNoteComplete} />;
 
       case 'relaxation_cards':
         return <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />;

@@ -4,12 +4,13 @@
  * Avatar tap opens modal with user details and logout.
  */
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Image,
+  Animated,
   Modal,
   Pressable,
 } from 'react-native';
@@ -25,6 +26,19 @@ export function UserHeader() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const auth = useContext(AuthContext);
+  const logoRotation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const spin = Animated.loop(
+      Animated.timing(logoRotation, {
+        toValue: 1,
+        duration: 14000,
+        useNativeDriver: true,
+      })
+    );
+    spin.start();
+    return () => spin.stop();
+  }, [logoRotation]);
   if (!auth) return null;
   const { user, signOut } = auth;
 
@@ -38,6 +52,10 @@ export function UserHeader() {
 
   const displayName = user.name?.trim() || user.email || 'User';
   const email = user.email || '';
+  const logoSpinInterpolate = logoRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <>
@@ -45,9 +63,9 @@ export function UserHeader() {
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.left}>
-            <Image
+            <Animated.Image
               source={require('../../../assets/images/geometry.jpeg')}
-              style={styles.logo}
+              style={[styles.logo, { transform: [{ rotate: logoSpinInterpolate }] }]}
               resizeMode="cover"
             />
             <Text style={styles.appName}>Gratitude Keeper</Text>
@@ -117,7 +135,7 @@ export function UserHeader() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: -18,
+    marginTop: -12,
     backgroundColor: 'rgba(10, 7, 20, 0.95)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
@@ -127,7 +145,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
     minHeight: HEADER_HEIGHT,
   },
   left: {
