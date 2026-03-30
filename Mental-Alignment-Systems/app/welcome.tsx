@@ -1,104 +1,162 @@
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { useRouter } from 'expo-router';
 import { Text } from '@/shared/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+const STARS_FALLING_VIDEO = require('../assets/live-room-video/starts-falling.mp4');
+
 export default function WelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const logoRotation = useRef(new Animated.Value(0)).current;
+
+  const player = useVideoPlayer(STARS_FALLING_VIDEO, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
+
+  useEffect(() => {
+    const spin = Animated.loop(
+      Animated.timing(logoRotation, {
+        toValue: 1,
+        duration: 20000,
+        useNativeDriver: true,
+      })
+    );
+    spin.start();
+    return () => spin.stop();
+  }, [logoRotation]);
+
+  const spinInterpolate = logoRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
-    <LinearGradient
-      colors={['#0A0714', '#1E1B2E', '#2D1B3D', '#3B2F4D']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.root}>
+      <VideoView
+        player={player}
+        style={styles.video}
+        contentFit="cover"
+        nativeControls={false}
+        fullscreenOptions={{ enable: false }}
+        showsTimecodes={false}
+        surfaceType="textureView"
+      />
+      <LinearGradient
+        colors={['rgba(10, 7, 20, 0.55)', 'rgba(30, 27, 46, 0.65)', 'rgba(10, 7, 20, 0.75)']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        pointerEvents="none"
+      />
       <View
         style={[
           styles.content,
           {
-            paddingTop: Math.max(insets.top, 12),
+            paddingTop: Math.max(insets.top, 16),
             paddingBottom: Math.max(insets.bottom, 28),
           },
         ]}
+        pointerEvents="box-none"
       >
         <View style={styles.logoShell}>
-          <Image source={require('../assets/images/geometry.jpeg')} style={styles.logo} resizeMode="cover" />
+          <Animated.Image
+            source={require('../assets/images/geometry.jpeg')}
+            style={[styles.logo, { transform: [{ rotate: spinInterpolate }] }]}
+            resizeMode="cover"
+          />
         </View>
 
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Tap below to begin your journey</Text>
+        <Text style={styles.headline}>Welcome.</Text>
+        <Text style={styles.copy}>
+          This is your space to slow down, reset, and return to yourself.
+        </Text>
 
-        <TouchableOpacity style={styles.enterButton} activeOpacity={0.85} onPress={() => router.push('/welcome-details')}>
-          <Text style={styles.enterText}>Enter</Text>
+        <TouchableOpacity
+          style={styles.cta}
+          activeOpacity={0.85}
+          onPress={() => router.push('/welcome-details')}
+        >
+          <Text style={styles.ctaText}>Begin your reset</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
+    backgroundColor: '#0A0714',
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 28,
     alignItems: 'center',
-    transform: [{ translateY: -20 }],
   },
   logoShell: {
-    width: 230,
-    height: 230,
-    borderRadius: 115,
-    borderWidth: 4,
-    borderColor: 'rgba(255, 176, 117, 0.9)',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: 'rgba(167, 139, 250, 0.55)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    marginBottom: 28,
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
     shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 14,
-    elevation: 6,
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    elevation: 8,
   },
   logo: {
-    width: 210,
-    height: 210,
-    borderRadius: 105,
+    width: 176,
+    height: 176,
+    borderRadius: 88,
   },
-  title: {
-    fontSize: 42,
+  headline: {
+    fontSize: 36,
     color: '#FFFFFF',
     fontWeight: '600',
-    padding: 24,
-    marginBottom: 12,
+    marginBottom: 16,
     fontFamily: 'serif',
-  },
-  subtitle: {
-    fontSize: 22,
-    color: 'rgba(255,255,255,0.78)',
     textAlign: 'center',
-    marginBottom: 32,
+    letterSpacing: 0.5,
   },
-  enterButton: {
-    minWidth: 170,
-    minHeight: 52,
-    borderRadius: 16,
+  copy: {
+    fontSize: 19,
+    lineHeight: 30,
+    color: 'rgba(255, 255, 255, 0.88)',
+    textAlign: 'center',
+    marginBottom: 36,
+    maxWidth: 340,
+  },
+  cta: {
+    minWidth: '88%',
+    maxWidth: 360,
+    minHeight: 54,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 26,
-    backgroundColor: 'rgba(139, 92, 246, 0.24)',
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(139, 92, 246, 0.35)',
     borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.5)',
+    borderColor: 'rgba(196, 181, 253, 0.55)',
   },
-  enterText: {
-    color: 'rgba(196, 181, 253, 0.95)',
-    fontSize: 26,
-    fontWeight: '700',
+  ctaText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.4,
   },
 });
