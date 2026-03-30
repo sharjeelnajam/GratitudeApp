@@ -25,6 +25,7 @@ import { Text, FadeInView, LanguageSwitcher } from '@/shared/ui';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
 import { promptGoogleSignIn } from '@/services/auth';
+import { isOnboardingCompleted } from '@/features/onboarding';
 import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
@@ -42,9 +43,18 @@ export default function LoginScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/');
-    }
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+    void (async () => {
+      const onboardingDone = await isOnboardingCompleted();
+      if (cancelled) return;
+      router.replace(onboardingDone ? '/' : '/welcome');
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, router]);
 
   useEffect(() => {
@@ -65,7 +75,6 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await signInEmail(email.trim(), password);
-      router.replace('/');
     } catch {
       setLocalError(t('auth.signInFailed'));
     } finally {
@@ -79,7 +88,6 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       await promptGoogleSignIn();
-      router.replace('/');
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('auth.googleSignInFailed');
       setLocalError(msg);

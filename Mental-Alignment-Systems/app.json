@@ -4,7 +4,7 @@
     "slug": "mental-alignment-systems",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/geometry.jpeg",
+    "icon": "./assets/images/appIcon.png",
     "splash": {
       "image": "./assets/images/geometry.jpeg",
       "resizeMode": "contain",
@@ -25,8 +25,8 @@
       ],
       "adaptiveIcon": {
         "backgroundColor": "#0A0714",
-        "foregroundImage": "./assets/images/geometry.jpeg",
-        "monochromeImage": "./assets/images/geometry.jpeg"
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "backgroundColor": "#0A0714",
       "edgeToEdgeEnabled": true,

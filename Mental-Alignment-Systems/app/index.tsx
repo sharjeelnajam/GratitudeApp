@@ -36,12 +36,16 @@ export default function IndexScreen() {
       if (cancelled) return;
 
       if (SHOW_PAYMENT_ALWAYS) {
-        router.replace(isAuthenticated ? '/payment' : '/welcome');
+        if (isAuthenticated) {
+          router.replace('/payment');
+          return;
+        }
+        router.replace('/login');
         return;
       }
 
       if (!isAuthenticated) {
-        router.replace('/welcome');
+        router.replace('/login');
         return;
       }
 

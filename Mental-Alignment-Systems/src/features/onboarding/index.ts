@@ -11,4 +11,4 @@
  * - index.ts - Public API exports
  */
 
-export {};
+export * from './storage';

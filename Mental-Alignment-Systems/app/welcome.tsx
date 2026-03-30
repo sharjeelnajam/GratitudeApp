@@ -1,23 +1,53 @@
-import { useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
+import { useCallback, useEffect, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { useRouter } from 'expo-router';
+import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Text } from '@/shared/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const STARS_FALLING_VIDEO = require('../assets/live-room-video/starts-falling.mp4');
+const WELCOME_AUDIO = require('../assets/audio/welcomScreenAudio.mpeg');
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const logoRotation = useRef(new Animated.Value(0)).current;
 
-  const player = useVideoPlayer(STARS_FALLING_VIDEO, (p) => {
+  const videoPlayer = useVideoPlayer(STARS_FALLING_VIDEO, (p) => {
     p.loop = true;
     p.muted = true;
     p.play();
   });
+
+  const welcomeAudio = useAudioPlayer(WELCOME_AUDIO);
+  const welcomeAudioStatus = useAudioPlayerStatus(welcomeAudio);
+
+  useEffect(() => {
+    void setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldPlayInBackground: false,
+    });
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!welcomeAudioStatus.isLoaded) {
+        return () => {};
+      }
+      welcomeAudio.loop = true;
+      welcomeAudio.play();
+      return () => {
+        welcomeAudio.pause();
+      };
+    }, [welcomeAudio, welcomeAudioStatus.isLoaded])
+  );
+
+  const beginReset = () => {
+    welcomeAudio.pause();
+    router.push('/onboarding');
+  };
 
   useEffect(() => {
     const spin = Animated.loop(
@@ -39,7 +69,7 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.root}>
       <VideoView
-        player={player}
+        player={videoPlayer}
         style={styles.video}
         contentFit="cover"
         nativeControls={false}
@@ -80,7 +110,7 @@ export default function WelcomeScreen() {
         <TouchableOpacity
           style={styles.cta}
           activeOpacity={0.85}
-          onPress={() => router.push('/welcome-details')}
+          onPress={beginReset}
         >
           <Text style={styles.ctaText}>Begin your reset</Text>
         </TouchableOpacity>
@@ -96,6 +126,7 @@ const styles = StyleSheet.create({
   },
   video: {
     ...StyleSheet.absoluteFillObject,
+    transform: [{ scale: 1.3 }],
   },
   content: {
     flex: 1,

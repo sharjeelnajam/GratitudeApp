@@ -26,6 +26,7 @@ import { Text, FadeInView } from '@/shared/ui';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
 import { promptGoogleSignIn } from '@/services/auth';
+import { isOnboardingCompleted } from '@/features/onboarding';
 import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
@@ -44,9 +45,18 @@ export default function SignUpScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/intro');
-    }
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+    void (async () => {
+      const onboardingDone = await isOnboardingCompleted();
+      if (cancelled) return;
+      router.replace(onboardingDone ? '/' : '/welcome');
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, router]);
 
   useEffect(() => {
@@ -78,7 +88,6 @@ export default function SignUpScreen() {
     try {
       await signUpEmail(email.trim(), password, name.trim() || undefined);
       console.log('[SignUp] Success');
-      router.replace('/questions');
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('auth.signUpFailed');
       console.log('[SignUp] Error:', msg);
@@ -96,7 +105,6 @@ export default function SignUpScreen() {
     try {
       await promptGoogleSignIn();
       console.log('[SignUp] Google success');
-      router.replace('/intro');
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('auth.googleSignUpFailed');
       console.log('[SignUp] Google error:', msg);

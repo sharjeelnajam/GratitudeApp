@@ -5,12 +5,14 @@
  */
 
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text, FadeInView, LanguageSwitcher } from '@/shared/ui';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '@/shared/contexts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsTab() {
   const { t } = useTranslation();
@@ -20,6 +22,29 @@ export default function SettingsTab() {
   const handleSignOut = async () => {
     await signOut();
     router.replace('/login');
+  };
+
+  const handleDevResetStorage = () => {
+    Alert.alert(
+      'Reset local app storage?',
+      'This clears AsyncStorage data used by the app on this device. Useful for re-testing onboarding and first-time flows.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              await signOut();
+              router.replace('/login');
+            } catch {
+              Alert.alert('Reset failed', 'Could not clear local storage. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -74,6 +99,17 @@ export default function SettingsTab() {
           >
             <MaterialIcons name="logout" size={20} color="#FCA5A5" />
             <Text style={styles.signOutText}>{t('settings.signOut')}</Text>
+          </TouchableOpacity>
+        </FadeInView>
+
+        <FadeInView duration={600} delay={460}>
+          <TouchableOpacity
+            style={styles.devResetButton}
+            onPress={handleDevResetStorage}
+            activeOpacity={0.7}
+          >
+            <MaterialIcons name="delete-forever" size={20} color="#FCD34D" />
+            <Text style={styles.devResetText}>Reset Local Storage (Dev)</Text>
           </TouchableOpacity>
         </FadeInView>
       </ScrollView>
@@ -158,5 +194,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#FCA5A5',
+  },
+  devResetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 10,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  devResetText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#FCD34D',
   },
 });
