@@ -94,26 +94,27 @@ export default function WelcomeScreen() {
         ]}
         pointerEvents="box-none"
       >
-        <View style={styles.logoShell}>
-          <Animated.Image
-            source={require('../assets/images/geometry.jpeg')}
-            style={[styles.logo, { transform: [{ rotate: spinInterpolate }] }]}
-            resizeMode="cover"
-          />
+        <View style={styles.topBlock}>
+          <View style={styles.logoShell}>
+            <Animated.Image
+              source={require('../assets/images/geometry.jpeg')}
+              style={[styles.logo, { transform: [{ rotate: spinInterpolate }] }]}
+              resizeMode="cover"
+            />
+          </View>
         </View>
 
-        <Text style={styles.headline}>Welcome.</Text>
-        <Text style={styles.copy}>
-          This is your space to slow down, reset, and return to yourself.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.cta}
-          activeOpacity={0.85}
-          onPress={beginReset}
-        >
-          <Text style={styles.ctaText}>Begin your reset</Text>
-        </TouchableOpacity>
+        <View style={styles.middleBlock}>
+          <Text style={styles.headline}>Welcome.</Text>
+          <Text style={styles.copy}>This is your space to slowdown and reset good energy</Text>
+          <TouchableOpacity
+            style={styles.cta}
+            activeOpacity={0.85}
+            onPress={beginReset}
+          >
+            <Text style={styles.ctaText}>Begin your journey to reset</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -130,8 +131,18 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: 28,
+    alignItems: 'center',
+  },
+  topBlock: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  middleBlock: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   logoShell: {

@@ -41,6 +41,7 @@ export default function LoginScreen() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [logoError, setLogoError] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const logoRotation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -64,6 +65,23 @@ export default function LoginScreen() {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  useEffect(() => {
+    const spin = Animated.loop(
+      Animated.timing(logoRotation, {
+        toValue: 1,
+        duration: 20000,
+        useNativeDriver: true,
+      })
+    );
+    spin.start();
+    return () => spin.stop();
+  }, [logoRotation]);
+
+  const spinInterpolate = logoRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   const displayError = localError ?? error;
 
@@ -139,11 +157,12 @@ export default function LoginScreen() {
                     ]}
                   />
                 ) : (
-                  <Image
+                  <Animated.Image
                     source={require('../assets/images/geometry.jpeg')}
                     style={[
                       styles.logoImage,
                       { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
+                      { transform: [{ rotate: spinInterpolate }] },
                     ]}
                     resizeMode="cover"
                     onError={() => setLogoError(true)}

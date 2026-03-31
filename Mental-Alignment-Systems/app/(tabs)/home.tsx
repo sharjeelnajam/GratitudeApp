@@ -31,8 +31,6 @@ export default function HomeTab() {
   const orbitRotation = useRef(new Animated.Value(0)).current;
   const brandingOpacity = useRef(new Animated.Value(0)).current;
   const brandingTranslateY = useRef(new Animated.Value(30)).current;
-  const welcomeOpacity = useRef(new Animated.Value(0)).current;
-  const welcomeTranslateY = useRef(new Animated.Value(30)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
   const buttonTranslateY = useRef(new Animated.Value(30)).current;
   const starsOpacity = useRef(new Animated.Value(0)).current;
@@ -64,13 +62,8 @@ export default function HomeTab() {
     ]).start();
 
     Animated.parallel([
-      Animated.timing(welcomeOpacity, { toValue: 1, duration: 1000, delay: 1000, useNativeDriver: true }),
-      Animated.timing(welcomeTranslateY, { toValue: 0, duration: 1000, delay: 1000, useNativeDriver: true }),
-    ]).start();
-
-    Animated.parallel([
-      Animated.timing(buttonOpacity, { toValue: 1, duration: 1000, delay: 1400, useNativeDriver: true }),
-      Animated.timing(buttonTranslateY, { toValue: 0, duration: 1000, delay: 1400, useNativeDriver: true }),
+      Animated.timing(buttonOpacity, { toValue: 1, duration: 1000, delay: 1000, useNativeDriver: true }),
+      Animated.timing(buttonTranslateY, { toValue: 0, duration: 1000, delay: 1000, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -183,7 +176,7 @@ export default function HomeTab() {
             <View style={styles.geometryGlow} />
             <View style={styles.geometryFrame}>
               <Image
-                source={require('../../assets/images/geometry.jpeg')}
+                source={require('../../assets/images/appIcon.png')}
                 style={styles.geometryImage}
                 resizeMode="contain"
                 onLoad={() => setImageLoaded(true)}
@@ -210,27 +203,15 @@ export default function HomeTab() {
           </Text>
         </Animated.View>
 
-        <Animated.View
-          style={[
-            styles.textContainer,
-            { opacity: welcomeOpacity, transform: [{ translateY: welcomeTranslateY }] },
-          ]}
-        >
-          <Text variant="h1" style={styles.welcomeText}>
-            {t('welcome.title')}
-          </Text>
-          <Text variant="body" style={styles.subtitleText}>
-            {t('welcome.subtitle')}
-          </Text>
-        </Animated.View>
-
         <Animated.View style={{ opacity: buttonOpacity, transform: [{ translateY: buttonTranslateY }] }}>
           <TouchableOpacity
             onPress={() => router.push('/intro')}
             activeOpacity={0.6}
             style={styles.buttonContainer}
           >
-            <Text style={styles.enterButtonText} numberOfLines={1} adjustsFontSizeToFit>{t('welcome.enter')}</Text>
+            <Text style={styles.enterButtonText} numberOfLines={1} adjustsFontSizeToFit>
+              Begin your journy
+            </Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -253,7 +234,7 @@ const styles = StyleSheet.create({
   geometryContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Math.min(48, height * 0.05),
+    marginBottom: Math.min(96, height * 0.12),
     position: 'relative',
   },
   particleRingWrapper: {
@@ -335,20 +316,6 @@ const styles = StyleSheet.create({
   },
   appSubtitle: { fontSize: 18, color: 'rgba(255, 255, 255, 0.8)', marginBottom: 4, fontWeight: '400' },
   appSubtext: { fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', fontStyle: 'italic' },
-  textContainer: { alignItems: 'center', marginBottom: Math.min(28, height * 0.025) },
-  welcomeText: {
-    fontSize: 42,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    marginBottom: 16,
-    textAlign: 'center',
-    fontFamily: 'serif',
-    letterSpacing: 3,
-    textShadowColor: 'rgba(139, 92, 246, 0.4)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  subtitleText: { fontSize: 16, color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', fontWeight: '400' },
   buttonContainer: {
     width: width * 0.7,
     maxWidth: 320,

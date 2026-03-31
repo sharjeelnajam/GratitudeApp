@@ -15,11 +15,11 @@ const SEGMENTS = 48;
 const RADIUS = Math.min(width * 0.38, 140);
 const STROKE_WIDTH = 5;
 const PHASE_DURATION_MS = 8000;
-const PHASES: { label: string; key: string }[] = [
-  { label: 'Breathe In', key: 'in' },
-  { label: 'Hold', key: 'hold1' },
-  { label: 'Breathe Out', key: 'out' },
-  { label: 'Hold', key: 'hold2' },
+const PHASES: { key: string }[] = [
+  { key: 'in' },
+  { key: 'hold1' },
+  { key: 'out' },
+  { key: 'hold2' },
 ];
 
 const BREATH_COLORS = {
@@ -53,6 +53,7 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
   const isLastPhase = phaseIndex >= PHASES.length - 1;
   const isBreathPhase = phase?.key === 'in' || phase?.key === 'out';
   const colors = isBreathPhase ? BREATH_COLORS : HOLD_COLORS;
+  const activityStateLabel = isBreathPhase ? 'Breathe' : 'Hold';
 
   useEffect(() => {
     progress.setValue(0);
@@ -139,15 +140,13 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['rgba(0,0,0,0.40)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.40)']}
+        colors={['rgba(0,0,0,0.00)', 'rgba(0,0,0,0.00)', 'rgba(0,0,0,0.00)']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
       <View style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.phaseLabel}>{phase?.label}</Text>
-
           <View style={styles.ringContainer}>
             {/* Track ring */}
             <View style={[styles.trackRing, { width: RADIUS * 2 + STROKE_WIDTH * 2, height: RADIUS * 2 + STROKE_WIDTH * 2, borderRadius: RADIUS + STROKE_WIDTH }]} />
@@ -188,9 +187,7 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
             })}
           </View>
           <Text style={styles.hint}>
-            {phase?.key === 'in' && 'Fill your lungs slowly'}
-            {phase?.key === 'out' && 'Release gently'}
-            {(phase?.key === 'hold1' || phase?.key === 'hold2') && 'Hold with ease'}
+            {activityStateLabel}
           </Text>
         </View>
       </View>
@@ -267,7 +264,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(139, 92, 246, 0.5)',
   },
   hint: {
-    fontSize: 14,
+    fontSize: 24,
     fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.6)',
     fontFamily: 'serif',

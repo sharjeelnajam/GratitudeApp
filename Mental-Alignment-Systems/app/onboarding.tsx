@@ -1,5 +1,13 @@
-import { useMemo, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Animated,
+  ImageSourcePropType,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,8 +18,10 @@ import {
   type EmotionalBaseline,
   saveOnboardingProfile,
 } from '@/features/onboarding';
+import { BreathingActivityPhase } from '@/features/rooms/components/BreathingActivityPhase';
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3 | 4 | 5;
+const READY_GEOMETRY: ImageSourcePropType = require('../assets/images/geometry.jpeg');
 
 const focusOptions: Array<{ value: FocusMode; label: string }> = [
   { value: 'stress_overwhelm', label: 'Stress & overwhelm' },
@@ -43,19 +53,53 @@ export default function OnboardingScreen() {
   const [timePreference, setTimePreference] = useState<DailyTimePreference | null>(null);
   const [baseline, setBaseline] = useState<EmotionalBaseline | null>(null);
   const [saving, setSaving] = useState(false);
+  const [activityCompleted, setActivityCompleted] = useState(false);
+  const readyRotation = useRef(new Animated.Value(0)).current;
+
+  const readySpin = readyRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const isReadyStep = step === 4;
+
+  useMemo(() => {
+    if (!isReadyStep) {
+      return undefined;
+    }
+    const spin = Animated.loop(
+      Animated.timing(readyRotation, {
+        toValue: 1,
+        duration: 22000,
+        useNativeDriver: true,
+      })
+    );
+    spin.start();
+    return () => {
+      readyRotation.setValue(0);
+      spin.stop();
+    };
+  }, [isReadyStep, readyRotation]);
 
   const canContinue = useMemo(() => {
     if (step === 1) return !!focusMode;
     if (step === 2) return !!timePreference;
     if (step === 3) return !!baseline;
+    if (step === 5) return activityCompleted;
     return true;
-  }, [step, focusMode, timePreference, baseline]);
+  }, [step, focusMode, timePreference, baseline, activityCompleted]);
 
   const handleNext = async () => {
     if (step < 4) {
       setStep((prev) => (prev + 1) as Step);
       return;
     }
+    if (step === 4) {
+      setStep(5);
+      return;
+    }
+
+    // Final submit from step 5
     if (!focusMode || !timePreference || !baseline || saving) return;
 
     setSaving(true);
@@ -103,8 +147,8 @@ export default function OnboardingScreen() {
 
           {step === 1 ? (
             <>
-            <Text style={styles.title}>Choose Your Focus</Text>
-            <Text style={styles.subtitle}>Select one area you want to prioritize first.</Text>
+            <Text style={styles.title}>SELECT AN AREA OF CONCERN</Text>
+            {/* <Text style={styles.subtitle}>Select one area you want to prioritize first.</Text> */}
             <View style={styles.optionsWrap}>
               {focusOptions.map((option) => (
                 <ChoiceButton
@@ -120,8 +164,8 @@ export default function OnboardingScreen() {
 
         {step === 2 ? (
           <>
-            <Text style={styles.title}>Daily Time Preference</Text>
-            <Text style={styles.subtitle}>When do you usually want your reset practice?</Text>
+            <Text style={styles.title}>Your Time Preference</Text>
+            {/* <Text style={styles.subtitle}>When do you usually want your reset practice?</Text> */}
             <View style={styles.optionsWrap}>
               {timeOptions.map((option) => (
                 <ChoiceButton
@@ -137,8 +181,8 @@ export default function OnboardingScreen() {
 
         {step === 3 ? (
           <>
-            <Text style={styles.title}>Emotional Baseline Check</Text>
-            <Text style={styles.subtitle}>How are you feeling most days lately?</Text>
+            <Text style={styles.title}>Emotional Baseline</Text>
+            <Text style={styles.subtitle}>How do you feel most days?</Text>
             <View style={styles.optionsWrap}>
               {baselineOptions.map((option) => (
                 <ChoiceButton
@@ -154,7 +198,13 @@ export default function OnboardingScreen() {
 
           {step === 4 ? (
             <View style={styles.readyWrap}>
-            <View style={styles.readyGlow} />
+            <View style={styles.readyImageShell}>
+              <Animated.Image
+                source={READY_GEOMETRY}
+                resizeMode="cover"
+                style={[styles.readyImage, { transform: [{ rotate: readySpin }] }]}
+              />
+            </View>
             <Text style={styles.readyTitle}>Your Gratitude Reset is ready.</Text>
             <Text style={styles.readySubtitle}>
               A calmer rhythm has been prepared for you.
@@ -183,6 +233,15 @@ export default function OnboardingScreen() {
             </View>
           </View>
         ) : null}
+
+        {step === 5 ? (
+          <View style={styles.activityWrap}>
+            <Text style={styles.activityTitle}>Breating Activity</Text>
+            <View style={styles.activityCard}>
+              <BreathingActivityPhase onComplete={() => setActivityCompleted(true)} />
+            </View>
+          </View>
+        ) : null}
         </View>
       </ScrollView>
 
@@ -208,7 +267,9 @@ export default function OnboardingScreen() {
           {saving ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.nextText}>{step === 4 ? 'Begin Day 1' : 'Continue'}</Text>
+            <Text style={styles.nextText}>
+              {step === 4 ? 'Activity' : step === 5 ? 'Begin Day 1' : 'Continue'}
+            </Text>
           )}
         </TouchableOpacity>
       </View>
@@ -256,9 +317,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    lineHeight: 36,
+    letterSpacing: 0.2,
     color: '#FFFFFF',
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
   },
   subtitle: {
@@ -303,16 +366,45 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 18,
     overflow: 'hidden',
+    alignItems: 'center',
   },
-  readyGlow: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    top: -110,
-    left: '50%',
-    marginLeft: -120,
-    backgroundColor: 'rgba(167,139,250,0.16)',
+  readyImageShell: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 2,
+    borderColor: 'rgba(167,139,250,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 18,
+    backgroundColor: 'rgba(12,10,24,0.9)',
+  },
+  readyImage: {
+    width: 122,
+    height: 122,
+    borderRadius: 61,
+  },
+  activityWrap: {
+    width: '100%',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    marginTop: 8,
+  },
+  activityTitle: {
+    fontSize: 36,
+    lineHeight: 32,
+    color: '#FFFFFF',
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: 0.3,
+  },
+  activityCard: {
+    height: 360,
+    borderRadius: 18,
+    overflow: 'hidden',
+    marginBottom: 0,
+    backgroundColor: 'transparent',
   },
   readyTitle: {
     fontSize: 32,
