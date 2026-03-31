@@ -11,17 +11,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useAuthContext } from '@/shared/contexts';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const PARTICLE_COUNT = 14;
-const RING_RADIUS = Math.min(width * 0.36, 140);
+const PARTICLE_COUNT = 10;
+const RING_RADIUS = Math.min(width * 0.26, 110);
 const PARTICLE_SIZE = 6;
 
 export default function HomeTab() {
-  const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuthContext();
   const insets = useSafeAreaInsets();
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -29,10 +29,14 @@ export default function HomeTab() {
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoRotation = useRef(new Animated.Value(0)).current;
   const orbitRotation = useRef(new Animated.Value(0)).current;
-  const brandingOpacity = useRef(new Animated.Value(0)).current;
-  const brandingTranslateY = useRef(new Animated.Value(30)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const buttonTranslateY = useRef(new Animated.Value(30)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const headerTranslateY = useRef(new Animated.Value(20)).current;
+  const primaryOpacity = useRef(new Animated.Value(0)).current;
+  const primaryTranslateY = useRef(new Animated.Value(20)).current;
+  const tilesOpacity = useRef(new Animated.Value(0)).current;
+  const tilesTranslateY = useRef(new Animated.Value(20)).current;
+  const bottomOpacity = useRef(new Animated.Value(0)).current;
+  const bottomTranslateY = useRef(new Animated.Value(20)).current;
   const starsOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -45,25 +49,34 @@ export default function HomeTab() {
     Animated.parallel([
       Animated.spring(logoScale, {
         toValue: 1,
-        tension: 50,
-        friction: 7,
+        tension: 40,
+        friction: 8,
         useNativeDriver: true,
       }),
       Animated.timing(logoOpacity, {
         toValue: 1,
-        duration: 1200,
+        duration: 1000,
         useNativeDriver: true,
       }),
     ]).start();
 
-    Animated.parallel([
-      Animated.timing(brandingOpacity, { toValue: 1, duration: 1000, delay: 600, useNativeDriver: true }),
-      Animated.timing(brandingTranslateY, { toValue: 0, duration: 1000, delay: 600, useNativeDriver: true }),
-    ]).start();
-
-    Animated.parallel([
-      Animated.timing(buttonOpacity, { toValue: 1, duration: 1000, delay: 1000, useNativeDriver: true }),
-      Animated.timing(buttonTranslateY, { toValue: 0, duration: 1000, delay: 1000, useNativeDriver: true }),
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(headerOpacity, { toValue: 1, duration: 700, delay: 200, useNativeDriver: true }),
+        Animated.timing(headerTranslateY, { toValue: 0, duration: 700, delay: 200, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(primaryOpacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(primaryTranslateY, { toValue: 0, duration: 700, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(tilesOpacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(tilesTranslateY, { toValue: 0, duration: 700, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(bottomOpacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(bottomTranslateY, { toValue: 0, duration: 700, useNativeDriver: true }),
+      ]),
     ]).start();
   }, []);
 
@@ -71,8 +84,8 @@ export default function HomeTab() {
     const timer = setTimeout(() => {
       const rotateAnimation = Animated.loop(
         Animated.sequence([
-          Animated.timing(logoRotation, { toValue: 1, duration: 8000, useNativeDriver: true }),
-          Animated.timing(logoRotation, { toValue: 0, duration: 8000, useNativeDriver: true }),
+          Animated.timing(logoRotation, { toValue: 1, duration: 12000, useNativeDriver: true }),
+          Animated.timing(logoRotation, { toValue: 0, duration: 12000, useNativeDriver: true }),
         ])
       );
       rotateAnimation.start();
@@ -105,6 +118,12 @@ export default function HomeTab() {
     };
   });
 
+  const userName =
+    user?.name?.trim() || user?.email?.split('@')[0]?.trim() || 'Friend';
+  const currentHour = new Date().getHours();
+  const greetingTime =
+    currentHour < 12 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
+
   return (
     <LinearGradient
       colors={['#0A0714', '#1E1B2E', '#2D1B3D', '#3B2F4D']}
@@ -129,10 +148,29 @@ export default function HomeTab() {
       </Animated.View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 48 + insets.bottom }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + 16, paddingBottom: 20 + insets.bottom },
+        ]}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
+        <Animated.View
+          style={[
+            styles.headerRow,
+            { opacity: headerOpacity, transform: [{ translateY: headerTranslateY }] },
+          ]}
+        >
+          <View>
+            <Text style={styles.greetingLabel}>{greetingTime},</Text>
+            <Text style={styles.greetingName}>{userName}</Text>
+          </View>
+          <View style={styles.moodPill}>
+            <View style={styles.moodDot} />
+            <Text style={styles.moodText}>Calm focus</Text>
+          </View>
+        </Animated.View>
+
         <View style={styles.geometryContainer}>
           <View style={styles.particleRingWrapper} pointerEvents="none">
             <Animated.View
@@ -146,9 +184,9 @@ export default function HomeTab() {
                 },
               ]}
             >
-              {particlePositions.map((pos, i) => (
+              {particlePositions.map((pos) => (
                 <View
-                  key={`particle-${i}`}
+                  key={`particle-${pos.left}-${pos.top}`}
                   style={[
                     styles.particle,
                     {
@@ -188,30 +226,67 @@ export default function HomeTab() {
 
         <Animated.View
           style={[
-            styles.brandingContainer,
-            { opacity: brandingOpacity, transform: [{ translateY: brandingTranslateY }] },
+            styles.primaryCard,
+            { opacity: primaryOpacity, transform: [{ translateY: primaryTranslateY }] },
           ]}
         >
-          <Text variant="h1" style={styles.appTitle}>
-            {t('welcome.appTitle')}
+          <Text style={styles.primaryLabel}>Primary focus</Text>
+          <Text style={styles.primaryTitle}>Start Today’s Reset</Text>
+          <Text style={styles.primaryCopy}>
+            A short, gentle sequence to clear your mind and soften the day.
           </Text>
-          <Text variant="body" style={styles.appSubtitle}>
-            {t('welcome.appSubtitle')}
-          </Text>
-          <Text variant="caption" style={styles.appSubtext}>
-            {t('welcome.appSubtext')}
-          </Text>
-        </Animated.View>
-
-        <Animated.View style={{ opacity: buttonOpacity, transform: [{ translateY: buttonTranslateY }] }}>
           <TouchableOpacity
             onPress={() => router.push('/intro')}
-            activeOpacity={0.6}
-            style={styles.buttonContainer}
+            activeOpacity={0.8}
+            style={styles.primaryButton}
           >
-            <Text style={styles.enterButtonText} numberOfLines={1} adjustsFontSizeToFit>
-              Begin your journy
-            </Text>
+            <Text style={styles.primaryButtonText}>Begin</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View
+          style={[
+            styles.tilesGrid,
+            { opacity: tilesOpacity, transform: [{ translateY: tilesTranslateY }] },
+          ]}
+        >
+          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
+            <Text style={styles.tileLabel}>Daily Reflection</Text>
+            <Text style={styles.tileSub}>Capture one gentle insight.</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
+            <Text style={styles.tileLabel}>Breathing Reset</Text>
+            <Text style={styles.tileSub}>Return to your breath in 1 minute.</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
+            <Text style={styles.tileLabel}>Emotional Check-In</Text>
+            <Text style={styles.tileSub}>Name how you feel without judgment.</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
+            <Text style={styles.tileLabel}>7-Day Progress</Text>
+            <Text style={styles.tileSub}>Notice subtle shifts over this week.</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View
+          style={[
+            styles.bottomRow,
+            { opacity: bottomOpacity, transform: [{ translateY: bottomTranslateY }] },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.guideButton}
+            activeOpacity={0.85}
+            onPress={() => router.push('/intro')}
+          >
+            <Text style={styles.guideText}>Speak with your guide</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            activeOpacity={0.85}
+            onPress={() => router.push('/(tabs)/settings')}
+          >
+            <Text style={styles.settingsText}>Settings</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -225,16 +300,50 @@ const styles = StyleSheet.create({
   star: { position: 'absolute', width: 2, height: 2, borderRadius: 1, backgroundColor: '#FFFFFF' },
   content: {
     flexGrow: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    paddingHorizontal: 24,
+  },
+  headerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 32,
-    paddingTop: 24,
-    paddingBottom: 32,
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  greetingLabel: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.65)',
+  },
+  greetingName: {
+    fontSize: 24,
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  moodPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(15,118,110,0.28)',
+    borderWidth: 1,
+    borderColor: 'rgba(45,212,191,0.4)',
+  },
+  moodDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#5EEAD4',
+    marginRight: 6,
+  },
+  moodText: {
+    fontSize: 13,
+    color: 'rgba(240,253,250,0.9)',
   },
   geometryContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Math.min(96, height * 0.12),
+    marginBottom: 24,
     position: 'relative',
   },
   particleRingWrapper: {
@@ -301,39 +410,113 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 25,
   },
-  brandingContainer: { alignItems: 'center', marginBottom: Math.min(20, height * 0.02) },
-  appTitle: {
-    fontSize: 38,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    fontFamily: 'serif',
-    textShadowColor: 'rgba(139, 92, 246, 0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
+  primaryCard: {
+    width: '100%',
+    borderRadius: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    backgroundColor: 'rgba(15,23,42,0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.55)',
+    marginBottom: 20,
+  },
+  primaryLabel: {
+    fontSize: 12,
+    color: 'rgba(148,163,184,0.9)',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
     marginBottom: 8,
-    letterSpacing: 2,
-    textAlign: 'center',
   },
-  appSubtitle: { fontSize: 18, color: 'rgba(255, 255, 255, 0.8)', marginBottom: 4, fontWeight: '400' },
-  appSubtext: { fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', fontStyle: 'italic' },
-  buttonContainer: {
-    width: width * 0.7,
-    maxWidth: 320,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.4)',
-    backgroundColor: 'transparent',
-    minHeight: 52,
-    justifyContent: 'center',
+  primaryTitle: {
+    fontSize: 24,
+    color: '#E5F4FF',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  primaryCopy: {
+    fontSize: 14,
+    color: 'rgba(226,232,240,0.9)',
+    lineHeight: 20,
+    marginBottom: 14,
+  },
+  primaryButton: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: 'rgba(56,189,248,0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(56,189,248,0.6)',
+  },
+  primaryButtonText: {
+    fontSize: 14,
+    color: '#E0F2FE',
+    fontWeight: '600',
+  },
+  tilesGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12,
+    marginBottom: 20,
+  },
+  tileCard: {
+    width: (width - 24 * 2 - 12) / 2,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(15,23,42,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(51,65,85,0.9)',
+  },
+  tileLabel: {
+    fontSize: 14,
+    color: '#E5E7EB',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  tileSub: {
+    fontSize: 12,
+    color: 'rgba(156,163,175,0.95)',
+    lineHeight: 17,
+  },
+  bottomRow: {
+    width: '100%',
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    justifyContent: 'space-between',
+    marginTop: 4,
   },
-  enterButtonText: {
-    color: 'rgba(139, 92, 246, 0.9)',
-    fontSize: 16,
-    fontWeight: '400',
-    letterSpacing: 0.8,
-    textAlign: 'center',
+  guideButton: {
+    flex: 1.3,
+    marginRight: 10,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: 'rgba(30,64,175,0.55)',
+    borderWidth: 1,
+    borderColor: 'rgba(129,140,248,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guideText: {
+    fontSize: 14,
+    color: '#E0E7FF',
+    fontWeight: '600',
+  },
+  settingsButton: {
+    flex: 0.8,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(15,23,42,0.7)',
+  },
+  settingsText: {
+    fontSize: 13,
+    color: 'rgba(209,213,219,0.95)',
+    fontWeight: '500',
   },
 });

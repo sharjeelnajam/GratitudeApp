@@ -20,13 +20,14 @@
       "supportsTablet": true
     },
     "android": {
+      "icon": "./assets/images/appIcon.png",
       "permissions": [
         "android.permission.HIGH_SAMPLING_RATE_SENSORS"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#0A0714",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/appIcon.png",
+        "monochromeImage": "./assets/images/appIcon.png"
       },
       "backgroundColor": "#0A0714",
       "edgeToEdgeEnabled": true,
