@@ -10,6 +10,7 @@ import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
 import { recordBreathingCompletionEvent } from '@/features/progress/storage';
+import { typography } from '@/theme/typography';
 
 const { width } = Dimensions.get('window');
 const SEGMENTS = 48;
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '300',
     color: '#FFFFFF',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 1.5,
     marginBottom: 40,
   },
@@ -269,6 +270,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.6)',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
   },
 });

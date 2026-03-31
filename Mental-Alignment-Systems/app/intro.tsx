@@ -14,6 +14,7 @@ import { useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { typography } from '@/theme/typography';
 
 const { width } = Dimensions.get('window');
 const HORIZONTAL_PADDING = 20;
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     paddingBottom: 8,
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 2,
     marginBottom: 5,
     textShadowColor: 'rgba(139, 92, 246, 0.5)',
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     paddingBottom: 8,
     color: '#FFFFFF',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 1,
   },
   carouselContent: {
@@ -417,7 +418,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#FFFFFF',
     marginBottom: 4,
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
   },
   cardDate: {
     fontSize: 14,

@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Text } from '@/shared/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { typography } from '@/theme/typography';
 
 export default function WelcomeDetailsScreen() {
   const router = useRouter();
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     textAlign: 'center',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     marginBottom: 6,
   },
   screenTitle: {
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 10,
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
   },
   cardBody: {
     fontSize: 18,

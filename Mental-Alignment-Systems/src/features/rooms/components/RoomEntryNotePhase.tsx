@@ -7,6 +7,7 @@
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, FadeInView, Button } from '@/shared/ui';
+import { typography } from '@/theme/typography';
 
 interface RoomEntryNotePhaseProps {
   readonly onComplete: () => void;
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '300',
     color: '#FFFFFF',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 1.2,
     marginBottom: 18,
     textAlign: 'center',

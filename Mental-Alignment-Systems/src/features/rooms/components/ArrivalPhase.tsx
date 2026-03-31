@@ -8,6 +8,7 @@
 import { View, StyleSheet } from 'react-native';
 import { AmbientBackground, Container, Text, FadeInView, Button } from '@/shared/ui';
 import { useTheme } from '@/theme';
+import { typography } from '@/theme/typography';
 
 interface ArrivalPhaseProps {
   roomName: string;
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     fontWeight: '300',
     letterSpacing: 0.4,
     marginBottom: 12,

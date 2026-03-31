@@ -52,7 +52,7 @@ export function Text({
           lineHeight: textStyle.fontSize * textStyle.lineHeight,
           letterSpacing: textStyle.letterSpacing,
           color: textColor,
-          fontFamily: theme.typography.fontFamily.sans.default,
+          fontFamily: textStyle.fontFamily ?? theme.typography.fontFamily.sans.default,
         },
         style,
       ]}

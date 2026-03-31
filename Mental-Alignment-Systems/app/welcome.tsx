@@ -6,6 +6,7 @@ import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-au
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Text } from '@/shared/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { typography } from '@/theme/typography';
 
 const STARS_FALLING_VIDEO = require('../assets/live-room-video/starts-falling.mp4');
 const WELCOME_AUDIO = require('../assets/audio/welcomScreenAudio.mpeg');
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     marginBottom: 16,
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     textAlign: 'center',
     letterSpacing: 0.5,
   },

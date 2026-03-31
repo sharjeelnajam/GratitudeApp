@@ -21,6 +21,7 @@ import { Text, FadeInView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { typography } from '@/theme/typography';
 
 const { width, height } = Dimensions.get('window');
 const CARD_PADDING_H = 20;
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#FFFFFF',
     textAlign: 'center',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 1.2,
     marginBottom: 10,
   },
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '400',
     color: '#FFFFFF',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     lineHeight: 30,
     marginBottom: 18,
   },

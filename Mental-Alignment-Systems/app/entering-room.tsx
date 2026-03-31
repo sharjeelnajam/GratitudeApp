@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useCallback } from 'react';
 import { DoorOpeningVideoBackground } from '@/features/rooms/components/DoorOpeningVideoBackground';
 import { useTranslation } from 'react-i18next';
+import { typography } from '@/theme/typography';
 
 const { width } = Dimensions.get('window');
 
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '300',
     color: 'rgba(255, 255, 255, 0.75)',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 1,
   },
 });

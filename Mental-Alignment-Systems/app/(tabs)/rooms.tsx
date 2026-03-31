@@ -11,6 +11,7 @@ import { Text, FadeInView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { typography } from '@/theme/typography';
 
 const { width, height } = Dimensions.get('window');
 const CARD_SPACING = 20;
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#FFFFFF',
     textAlign: 'center',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 2,
     marginBottom: 12,
   },
@@ -378,7 +379,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '500',
     fontSize: 22,
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 0.5,
   },
   roomDescription: { marginBottom: 6, lineHeight: 20, color: 'rgba(255, 255, 255, 0.85)', fontSize: 14, fontWeight: '300' },

@@ -4,8 +4,7 @@
  * Language selection, app info, and sign out.
  */
 
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Text, FadeInView, LanguageSwitcher } from '@/shared/ui';
@@ -13,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '@/shared/contexts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { typography } from '@/theme/typography';
 
 export default function SettingsTab() {
   const { t } = useTranslation();
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '300',
     color: '#FFFFFF',
-    fontFamily: 'serif',
+    fontFamily: typography.fontFamily.serif.default,
     letterSpacing: 2,
     marginBottom: 12,
   },
