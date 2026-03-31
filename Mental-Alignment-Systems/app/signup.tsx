@@ -27,6 +27,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthContext } from '@/shared/contexts';
 import { promptGoogleSignIn } from '@/services/auth';
 import { isOnboardingCompleted } from '@/features/onboarding';
+import { recordLoginEvent } from '@/features/progress/storage';
 import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
@@ -43,12 +44,20 @@ export default function SignUpScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const loginRecordedRef = useRef(false);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      loginRecordedRef.current = false;
+      return;
+    }
 
     let cancelled = false;
     void (async () => {
+      if (!loginRecordedRef.current) {
+        loginRecordedRef.current = true;
+        await recordLoginEvent();
+      }
       const onboardingDone = await isOnboardingCompleted();
       if (cancelled) return;
       router.replace(onboardingDone ? '/' : '/welcome');

@@ -392,6 +392,7 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontSize: 36,
+    padding: 8,
     lineHeight: 32,
     color: '#FFFFFF',
     fontWeight: '500',
@@ -400,9 +401,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   activityCard: {
-    height: 360,
+    height: 404,
     borderRadius: 18,
     overflow: 'hidden',
+    marginTop: 8,
+    paddingBottom: 12,
     marginBottom: 0,
     backgroundColor: 'transparent',
   },

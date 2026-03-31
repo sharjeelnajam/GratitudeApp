@@ -9,9 +9,10 @@ import { View, StyleSheet, Image, Dimensions, TouchableOpacity, Animated, Scroll
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
-import { useRouter } from 'expo-router';
-import { useState, useEffect, useRef } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuthContext } from '@/shared/contexts';
+import { getLast7DayProgress, type Last7DayProgress } from '@/features/progress/storage';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,11 @@ export default function HomeTab() {
   const { user } = useAuthContext();
   const insets = useSafeAreaInsets();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [last7Progress, setLast7Progress] = useState<Last7DayProgress>({
+    logins: 0,
+    breathing: 0,
+    activeDays: 0,
+  });
 
   const logoScale = useRef(new Animated.Value(0.3)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -121,8 +127,27 @@ export default function HomeTab() {
   const userName =
     user?.name?.trim() || user?.email?.split('@')[0]?.trim() || 'Friend';
   const currentHour = new Date().getHours();
-  const greetingTime =
-    currentHour < 12 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
+  let greetingTime = 'Good evening';
+  if (currentHour < 12) {
+    greetingTime = 'Good morning';
+  } else if (currentHour < 18) {
+    greetingTime = 'Good afternoon';
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      void (async () => {
+        const stats = await getLast7DayProgress();
+        if (active) {
+          setLast7Progress(stats);
+        }
+      })();
+      return () => {
+        active = false;
+      };
+    }, [])
+  );
 
   return (
     <LinearGradient
@@ -264,7 +289,10 @@ export default function HomeTab() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
             <Text style={styles.tileLabel}>7-Day Progress</Text>
-            <Text style={styles.tileSub}>Notice subtle shifts over this week.</Text>
+            <Text style={styles.tileSub}>
+              Logins: {last7Progress.logins} | Breathing: {last7Progress.breathing}
+            </Text>
+            <Text style={styles.tileSub}>Active days: {last7Progress.activeDays} / 7</Text>
           </TouchableOpacity>
         </Animated.View>
 

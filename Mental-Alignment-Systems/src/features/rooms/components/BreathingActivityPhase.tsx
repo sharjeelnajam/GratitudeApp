@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '@/shared/ui';
+import { recordBreathingCompletionEvent } from '@/features/progress/storage';
 
 const { width } = Dimensions.get('window');
 const SEGMENTS = 48;
@@ -95,6 +96,7 @@ export function BreathingActivityPhase({ onComplete }: BreathingActivityPhasePro
 
     timerRef.current = setTimeout(() => {
       if (isLastPhase) {
+        void recordBreathingCompletionEvent();
         onComplete();
         return;
       }
