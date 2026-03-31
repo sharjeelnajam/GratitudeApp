@@ -9,6 +9,9 @@ dist/
 web-build/
 expo-env.d.ts
 
+#service account
+service-account.json
+
 # Native
 .kotlin/
 *.orig.*
