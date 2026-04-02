@@ -12,12 +12,17 @@ import { Text } from '@/shared/ui';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuthContext } from '@/shared/contexts';
-import { getLast7DayProgress, type Last7DayProgress } from '@/features/progress/storage';
+import {
+  getLast7DayProgress,
+  getLast7DayProgressSeries,
+  type Last7DayProgress,
+  type Last7DayProgressPoint,
+} from '@/features/progress/storage';
 
 const { width } = Dimensions.get('window');
 
 const PARTICLE_COUNT = 10;
-const RING_RADIUS = Math.min(width * 0.26, 110);
+const RING_RADIUS = Math.min(width * 0.2, 82);
 const PARTICLE_SIZE = 6;
 
 export default function HomeTab() {
@@ -30,6 +35,7 @@ export default function HomeTab() {
     breathing: 0,
     activeDays: 0,
   });
+  const [last7Series, setLast7Series] = useState<Last7DayProgressPoint[]>([]);
 
   const logoScale = useRef(new Animated.Value(0.3)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -138,9 +144,13 @@ export default function HomeTab() {
     useCallback(() => {
       let active = true;
       void (async () => {
-        const stats = await getLast7DayProgress();
+        const [stats, series] = await Promise.all([
+          getLast7DayProgress(),
+          getLast7DayProgressSeries(),
+        ]);
         if (active) {
           setLast7Progress(stats);
+          setLast7Series(series);
         }
       })();
       return () => {
@@ -148,6 +158,8 @@ export default function HomeTab() {
       };
     }, [])
   );
+
+  const maxBarValue = Math.max(1, ...last7Series.map((p) => p.total));
 
   return (
     <LinearGradient
@@ -289,10 +301,28 @@ export default function HomeTab() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
             <Text style={styles.tileLabel}>7-Day Progress</Text>
-            <Text style={styles.tileSub}>
-              Logins: {last7Progress.logins} | Breathing: {last7Progress.breathing}
+            <View style={styles.progressChartRow}>
+              {last7Series.map((point, idx) => {
+                const barHeight = Math.max(6, (point.total / maxBarValue) * 34);
+                return (
+                  <View key={`${point.dayLabel}-${idx}`} style={styles.progressBarWrap}>
+                    <View style={[styles.progressBar, { height: barHeight }]} />
+                    <Text style={styles.progressDayLabel}>{point.dayLabel}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={styles.progressStatsRow}>
+              <Text style={styles.tileStatText} numberOfLines={1}>
+                Logins: {last7Progress.logins}
+              </Text>
+              <Text style={styles.tileStatText} numberOfLines={1}>
+                Breaths: {last7Progress.breathing}
+              </Text>
+            </View>
+            <Text style={styles.tileStatText} numberOfLines={1}>
+              Active: {last7Progress.activeDays} / 7
             </Text>
-            <Text style={styles.tileSub}>Active days: {last7Progress.activeDays} / 7</Text>
           </TouchableOpacity>
         </Animated.View>
 
@@ -308,13 +338,6 @@ export default function HomeTab() {
             onPress={() => router.push('/intro')}
           >
             <Text style={styles.guideText}>Speak with your guide</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            activeOpacity={0.85}
-            onPress={() => router.push('/(tabs)/settings')}
-          >
-            <Text style={styles.settingsText}>Settings</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -336,7 +359,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 14,
   },
   greetingLabel: {
     fontSize: 14,
@@ -371,7 +394,7 @@ const styles = StyleSheet.create({
   geometryContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
     position: 'relative',
   },
   particleRingWrapper: {
@@ -396,9 +419,9 @@ const styles = StyleSheet.create({
   geometryInner: { alignItems: 'center', justifyContent: 'center' },
   geometryGlow: {
     position: 'absolute',
-    width: Math.min(width * 0.68, 280),
-    height: Math.min(width * 0.68, 280),
-    borderRadius: Math.min(width * 0.34, 140),
+    width: Math.min(width * 0.5, 190),
+    height: Math.min(width * 0.5, 190),
+    borderRadius: Math.min(width * 0.25, 95),
     backgroundColor: 'rgba(139, 92, 246, 0.2)',
     shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 0 },
@@ -407,9 +430,9 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   geometryFrame: {
-    width: Math.min(width * 0.58, 240),
-    height: Math.min(width * 0.58, 240),
-    borderRadius: Math.min(width * 0.29, 120),
+    width: Math.min(width * 0.42, 170),
+    height: Math.min(width * 0.42, 170),
+    borderRadius: Math.min(width * 0.21, 85),
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 2,
     borderColor: 'rgba(139, 92, 246, 0.5)',
@@ -441,43 +464,43 @@ const styles = StyleSheet.create({
   primaryCard: {
     width: '100%',
     borderRadius: 20,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
     backgroundColor: 'rgba(15,23,42,0.9)',
     borderWidth: 1,
     borderColor: 'rgba(148,163,184,0.55)',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   primaryLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: 'rgba(148,163,184,0.9)',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   primaryTitle: {
-    fontSize: 24,
+    fontSize: 19,
     color: '#E5F4FF',
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   primaryCopy: {
-    fontSize: 14,
+    fontSize: 12,
     color: 'rgba(226,232,240,0.9)',
-    lineHeight: 20,
-    marginBottom: 14,
+    lineHeight: 16,
+    marginBottom: 8,
   },
   primaryButton: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 13,
+    paddingVertical: 0,
     borderRadius: 999,
     backgroundColor: 'rgba(56,189,248,0.22)',
     borderWidth: 1,
     borderColor: 'rgba(56,189,248,0.6)',
   },
   primaryButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#E0F2FE',
     fontWeight: '600',
   },
@@ -491,12 +514,15 @@ const styles = StyleSheet.create({
   },
   tileCard: {
     width: (width - 24 * 2 - 12) / 2,
+    height: 132,
     borderRadius: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: 'rgba(15,23,42,0.82)',
     borderWidth: 1,
     borderColor: 'rgba(51,65,85,0.9)',
+    justifyContent: 'flex-start',
+    overflow: 'hidden',
   },
   tileLabel: {
     fontSize: 14,
@@ -507,18 +533,50 @@ const styles = StyleSheet.create({
   tileSub: {
     fontSize: 12,
     color: 'rgba(156,163,175,0.95)',
-    lineHeight: 17,
+    lineHeight: 16,
+  },
+  progressChartRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+    marginTop: 2,
+    minHeight: 42,
+  },
+  progressBarWrap: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    width: 18,
+  },
+  progressBar: {
+    width: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(94,234,212,0.9)',
+    marginBottom: 4,
+  },
+  progressDayLabel: {
+    fontSize: 10,
+    color: 'rgba(148,163,184,0.9)',
+  },
+  progressStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+    gap: 6,
+  },
+  tileStatText: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 14,
+    color: 'rgba(156,163,175,0.95)',
   },
   bottomRow: {
     width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 4,
+    alignItems: 'stretch',
+    marginTop: 2,
   },
   guideButton: {
-    flex: 1.3,
-    marginRight: 10,
+    width: '100%',
     paddingVertical: 10,
     borderRadius: 999,
     backgroundColor: 'rgba(30,64,175,0.55)',
@@ -531,20 +589,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#E0E7FF',
     fontWeight: '600',
-  },
-  settingsButton: {
-    flex: 0.8,
-    paddingVertical: 10,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(15,23,42,0.7)',
-  },
-  settingsText: {
-    fontSize: 13,
-    color: 'rgba(209,213,219,0.95)',
-    fontWeight: '500',
   },
 });

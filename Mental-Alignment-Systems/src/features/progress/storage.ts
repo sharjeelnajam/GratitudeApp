@@ -17,6 +17,13 @@ export interface Last7DayProgress {
   activeDays: number;
 }
 
+export interface Last7DayProgressPoint {
+  dayLabel: string;
+  logins: number;
+  breathing: number;
+  total: number;
+}
+
 function getLocalDateKey(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -89,5 +96,24 @@ export async function getLast7DayProgress(): Promise<Last7DayProgress> {
   }
 
   return { logins, breathing, activeDays };
+}
+
+export async function getLast7DayProgressSeries(): Promise<Last7DayProgressPoint[]> {
+  const map = await readProgressMap();
+  const keysNewestFirst = getDayKeysBack(WINDOW_DAYS);
+  const keysOldestFirst = [...keysNewestFirst].reverse();
+
+  return keysOldestFirst.map((key) => {
+    const day = map[key] ?? { logins: 0, breathing: 0 };
+    const date = new Date(`${key}T00:00:00`);
+    const dayLabel = date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 1);
+    const total = (day.logins || 0) + (day.breathing || 0);
+    return {
+      dayLabel,
+      logins: day.logins || 0,
+      breathing: day.breathing || 0,
+      total,
+    };
+  });
 }
 

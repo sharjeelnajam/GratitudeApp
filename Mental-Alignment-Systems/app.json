@@ -4,9 +4,9 @@
     "slug": "mental-alignment-systems",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/appIcon.png",
+    "icon": "./assets/images/appIconOuter.png",
     "splash": {
-      "image": "./assets/images/geometry.jpeg",
+      "image": "./assets/images/appIcon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0A0714",
       "dark": {
@@ -43,7 +43,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/geometry.jpeg",
+          "image": "./assets/images/appIcon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#0A0714",

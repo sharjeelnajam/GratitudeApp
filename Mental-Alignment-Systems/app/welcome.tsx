@@ -106,7 +106,7 @@ export default function WelcomeScreen() {
         </View>
 
         <View style={styles.middleBlock}>
-          <Text style={styles.headline}>Welcome.</Text>
+          <Text style={styles.headline}>Welcome</Text>
           <Text style={styles.copy}>This is your space to slowdown and reset good energy</Text>
           <TouchableOpacity
             style={styles.cta}
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   video: {
     ...StyleSheet.absoluteFillObject,
-    transform: [{ scale: 1.3 }],
+    transform: [{ scale: 1.2 }],
   },
   content: {
     flex: 1,
