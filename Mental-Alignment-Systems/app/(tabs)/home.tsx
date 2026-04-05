@@ -8,6 +8,7 @@
 import { View, StyleSheet, Image, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Text } from '@/shared/ui';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -20,6 +21,51 @@ import {
 } from '@/features/progress/storage';
 
 const { width } = Dimensions.get('window');
+
+const REFLECTION_TILES = [
+  {
+    key: 'reflection',
+    title: 'Daily Reflection',
+    subtitle: 'Capture one gentle insight.',
+    colors: ['#1a3d42', '#14101f'] as const,
+    icon: 'auto-stories' as const,
+    iconColor: '#7dd3fc',
+    accent: '#5eead4',
+  },
+  {
+    key: 'breathing',
+    title: 'Breathing Reset',
+    subtitle: 'Return to your breath in one minute.',
+    colors: ['#3d2f5c', '#161223'] as const,
+    icon: 'spa' as const,
+    iconColor: '#ddd6fe',
+    accent: '#a78bfa',
+  },
+  {
+    key: 'checkin',
+    title: 'Emotional Check-In',
+    subtitle: 'Name how you feel, without judgment.',
+    colors: ['#4a3058', '#120f18'] as const,
+    icon: 'favorite-outline' as const,
+    iconColor: '#f9a8d4',
+    accent: '#f472b6',
+  },
+] as const;
+
+const PROGRESS_TILE = {
+  colors: ['#2a2540', '#0c0a12'] as const,
+  icon: 'show-chart' as const,
+  iconColor: '#fcd34d',
+  accent: '#fbbf24',
+};
+
+/** Hero card — same visual language as reflection tiles (gradient, bubble, accent). */
+const PRIMARY_FOCUS_TILE = {
+  colors: ['#1a3650', '#0c1222'] as const,
+  icon: 'auto-awesome' as const,
+  iconColor: '#7dd3fc',
+  accent: '#38bdf8',
+};
 
 const PARTICLE_COUNT = 10;
 const RING_RADIUS = Math.min(width * 0.2, 82);
@@ -262,22 +308,40 @@ export default function HomeTab() {
         </View>
 
         <Animated.View
-          style={[
-            styles.primaryCard,
-            { opacity: primaryOpacity, transform: [{ translateY: primaryTranslateY }] },
-          ]}
+          style={[{ opacity: primaryOpacity, transform: [{ translateY: primaryTranslateY }] }]}
         >
-          <Text style={styles.primaryLabel}>Primary focus</Text>
-          <Text style={styles.primaryTitle}>Start Today’s Reset</Text>
-          <Text style={styles.primaryCopy}>
-            A short, gentle sequence to clear your mind and soften the day.
-          </Text>
           <TouchableOpacity
+            activeOpacity={0.88}
             onPress={() => router.push('/intro')}
-            activeOpacity={0.8}
-            style={styles.primaryButton}
+            style={styles.primaryTileOuter}
           >
-            <Text style={styles.primaryButtonText}>Begin</Text>
+            <LinearGradient
+              colors={[PRIMARY_FOCUS_TILE.colors[0], PRIMARY_FOCUS_TILE.colors[1]]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.primaryTileGradient}
+            >
+              <View style={styles.reflectTopRow}>
+                <View style={styles.reflectIconBubble}>
+                  <MaterialIcons
+                    name={PRIMARY_FOCUS_TILE.icon}
+                    size={20}
+                    color={PRIMARY_FOCUS_TILE.iconColor}
+                  />
+                </View>
+                <View
+                  style={[styles.reflectAccentDot, { backgroundColor: PRIMARY_FOCUS_TILE.accent }]}
+                />
+              </View>
+              <Text style={styles.primaryEyebrow}>Primary focus</Text>
+              <Text style={styles.primaryHeroTitle}>Start Today’s Reset</Text>
+              <Text style={styles.primaryHeroCopy}>
+                A short, gentle sequence to clear your mind and soften the day.
+              </Text>
+              <View style={styles.primaryCtaPill}>
+                <Text style={styles.primaryCtaText}>Begin</Text>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
 
@@ -287,43 +351,101 @@ export default function HomeTab() {
             { opacity: tilesOpacity, transform: [{ translateY: tilesTranslateY }] },
           ]}
         >
-          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
-            <Text style={styles.tileLabel}>Daily Reflection</Text>
-            <Text style={styles.tileSub}>Capture one gentle insight.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
-            <Text style={styles.tileLabel}>Breathing Reset</Text>
-            <Text style={styles.tileSub}>Return to your breath in 1 minute.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
-            <Text style={styles.tileLabel}>Emotional Check-In</Text>
-            <Text style={styles.tileSub}>Name how you feel without judgment.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tileCard} activeOpacity={0.85}>
-            <Text style={styles.tileLabel}>7-Day Progress</Text>
-            <View style={styles.progressChartRow}>
-              {last7Series.map((point, idx) => {
-                const barHeight = Math.max(6, (point.total / maxBarValue) * 34);
-                return (
-                  <View key={`${point.dayLabel}-${idx}`} style={styles.progressBarWrap}>
-                    <View style={[styles.progressBar, { height: barHeight }]} />
-                    <Text style={styles.progressDayLabel}>{point.dayLabel}</Text>
+          <View style={styles.tilesRow}>
+            {REFLECTION_TILES.slice(0, 2).map((tile) => (
+              <TouchableOpacity
+                key={tile.key}
+                style={styles.reflectTileOuter}
+                activeOpacity={0.88}
+              >
+                <LinearGradient
+                  colors={[tile.colors[0], tile.colors[1]]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.reflectTileGradient}
+                >
+                  <View style={styles.reflectTopRow}>
+                    <View style={styles.reflectIconBubble}>
+                      <MaterialIcons name={tile.icon} size={20} color={tile.iconColor} />
+                    </View>
+                    <View style={[styles.reflectAccentDot, { backgroundColor: tile.accent }]} />
                   </View>
-                );
-              })}
-            </View>
-            <View style={styles.progressStatsRow}>
-              <Text style={styles.tileStatText} numberOfLines={1}>
-                Logins: {last7Progress.logins}
-              </Text>
-              <Text style={styles.tileStatText} numberOfLines={1}>
-                Breaths: {last7Progress.breathing}
-              </Text>
-            </View>
-            <Text style={styles.tileStatText} numberOfLines={1}>
-              Active: {last7Progress.activeDays} / 7
-            </Text>
-          </TouchableOpacity>
+                  <Text style={styles.reflectTitle}>{tile.title}</Text>
+                  <Text style={styles.reflectSubtitle}>{tile.subtitle}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={[styles.tilesRow, styles.tilesRowLast]}>
+            {REFLECTION_TILES.slice(2).map((tile) => (
+              <TouchableOpacity
+                key={tile.key}
+                style={styles.reflectTileOuter}
+                activeOpacity={0.88}
+                onPress={
+                  tile.key === 'checkin'
+                    ? () => router.push('/emotional-path')
+                    : undefined
+                }
+              >
+                <LinearGradient
+                  colors={[tile.colors[0], tile.colors[1]]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.reflectTileGradient}
+                >
+                  <View style={styles.reflectTopRow}>
+                    <View style={styles.reflectIconBubble}>
+                      <MaterialIcons name={tile.icon} size={20} color={tile.iconColor} />
+                    </View>
+                    <View style={[styles.reflectAccentDot, { backgroundColor: tile.accent }]} />
+                  </View>
+                  <Text style={styles.reflectTitle}>{tile.title}</Text>
+                  <Text style={styles.reflectSubtitle}>{tile.subtitle}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity style={styles.reflectTileOuter} activeOpacity={0.88}>
+              <LinearGradient
+                colors={[PROGRESS_TILE.colors[0], PROGRESS_TILE.colors[1]]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.reflectTileGradient}
+              >
+                <View style={styles.reflectTopRow}>
+                  <View style={styles.reflectIconBubble}>
+                    <MaterialIcons name={PROGRESS_TILE.icon} size={20} color={PROGRESS_TILE.iconColor} />
+                  </View>
+                  <View style={[styles.reflectAccentDot, { backgroundColor: PROGRESS_TILE.accent }]} />
+                </View>
+                <Text style={styles.reflectTitle}>7-Day Progress</Text>
+                <View style={styles.progressChartRow}>
+                  {last7Series.map((point, idx) => {
+                    const barHeight = Math.max(5, (point.total / maxBarValue) * 28);
+                    return (
+                      <View key={`${point.dayLabel}-${idx}`} style={styles.progressBarWrap}>
+                        <View style={[styles.progressBar, { height: barHeight }]} />
+                        <Text style={styles.progressDayLabel}>{point.dayLabel}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+                <View style={styles.progressStatsRow}>
+                  <Text style={styles.reflectStatText} numberOfLines={1}>
+                    Logins {last7Progress.logins}
+                  </Text>
+                  <Text style={styles.reflectStatText} numberOfLines={1}>
+                    Breaths {last7Progress.breathing}
+                  </Text>
+                </View>
+                <Text style={styles.reflectStatTextMuted} numberOfLines={1}>
+                  Active {last7Progress.activeDays} / 7
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
 
         <Animated.View
@@ -333,11 +455,18 @@ export default function HomeTab() {
           ]}
         >
           <TouchableOpacity
-            style={styles.guideButton}
-            activeOpacity={0.85}
+            style={styles.guideButtonOuter}
+            activeOpacity={0.88}
             onPress={() => router.push('/intro')}
           >
-            <Text style={styles.guideText}>Speak with your guide</Text>
+            <LinearGradient
+              colors={['#1e4550', '#1e1830']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.guideButtonGradient}
+            >
+              <Text style={styles.guideText}>Speak with your Gratitude keeper guide</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -461,102 +590,150 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 25,
   },
-  primaryCard: {
+  primaryTileOuter: {
     width: '100%',
-    borderRadius: 20,
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(15,23,42,0.9)',
-    borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.55)',
-    marginBottom: 12,
+    borderRadius: 22,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
   },
-  primaryLabel: {
+  primaryTileGradient: {
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    overflow: 'hidden',
+  },
+  primaryEyebrow: {
+    marginTop: 10,
     fontSize: 11,
-    color: 'rgba(148,163,184,0.9)',
+    color: 'rgba(148,200,255,0.72)',
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: 6,
   },
-  primaryTitle: {
-    fontSize: 19,
-    color: '#E5F4FF',
+  primaryHeroTitle: {
+    fontSize: 21,
+    color: 'rgba(255,255,255,0.98)',
     fontWeight: '600',
-    marginBottom: 4,
+    letterSpacing: 0.2,
+    marginBottom: 6,
   },
-  primaryCopy: {
+  primaryHeroCopy: {
     fontSize: 12,
-    color: 'rgba(226,232,240,0.9)',
-    lineHeight: 16,
-    marginBottom: 8,
+    lineHeight: 17,
+    color: 'rgba(226,232,240,0.78)',
+    marginBottom: 12,
   },
-  primaryButton: {
+  primaryCtaPill: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 13,
-    paddingVertical: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: 'rgba(56,189,248,0.22)',
+    backgroundColor: 'rgba(56,189,248,0.2)',
     borderWidth: 1,
-    borderColor: 'rgba(56,189,248,0.6)',
+    borderColor: 'rgba(56,189,248,0.55)',
   },
-  primaryButtonText: {
+  primaryCtaText: {
     fontSize: 13,
     color: '#E0F2FE',
     fontWeight: '600',
   },
   tilesGrid: {
     width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 12,
     marginBottom: 20,
   },
-  tileCard: {
-    width: (width - 24 * 2 - 12) / 2,
-    height: 132,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(15,23,42,0.82)',
+  tilesRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    columnGap: 12,
+    marginBottom: 14,
+  },
+  tilesRowLast: {
+    marginBottom: 0,
+  },
+  reflectTileOuter: {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  reflectTileGradient: {
+    flex: 1,
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 12,
+    minHeight: 138,
     borderWidth: 1,
-    borderColor: 'rgba(51,65,85,0.9)',
-    justifyContent: 'flex-start',
+    borderColor: 'rgba(255,255,255,0.12)',
     overflow: 'hidden',
   },
-  tileLabel: {
-    fontSize: 14,
-    color: '#E5E7EB',
-    fontWeight: '500',
-    marginBottom: 4,
+  reflectTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  tileSub: {
-    fontSize: 12,
-    color: 'rgba(156,163,175,0.95)',
-    lineHeight: 16,
+  reflectIconBubble: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reflectAccentDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  reflectTitle: {
+    marginTop: 10,
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.96)',
+    letterSpacing: 0.2,
+  },
+  reflectSubtitle: {
+    marginTop: 4,
+    fontSize: 11,
+    lineHeight: 15,
+    color: 'rgba(255,255,255,0.68)',
   },
   progressChartRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
+    marginTop: 8,
     marginBottom: 6,
-    marginTop: 2,
-    minHeight: 42,
+    minHeight: 36,
   },
   progressBarWrap: {
     alignItems: 'center',
     justifyContent: 'flex-end',
-    width: 18,
+    width: 16,
   },
   progressBar: {
-    width: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(94,234,212,0.9)',
-    marginBottom: 4,
+    width: 7,
+    borderRadius: 6,
+    backgroundColor: 'rgba(253,224,71,0.85)',
+    marginBottom: 3,
   },
   progressDayLabel: {
-    fontSize: 10,
-    color: 'rgba(148,163,184,0.9)',
+    fontSize: 9,
+    color: 'rgba(226,232,240,0.65)',
   },
   progressStatsRow: {
     flexDirection: 'row',
@@ -564,30 +741,49 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     gap: 6,
   },
-  tileStatText: {
+  reflectStatText: {
     flex: 1,
-    fontSize: 11,
-    lineHeight: 14,
-    color: 'rgba(156,163,175,0.95)',
+    fontSize: 10,
+    lineHeight: 13,
+    color: 'rgba(226,232,240,0.88)',
+    fontWeight: '500',
+  },
+  reflectStatTextMuted: {
+    fontSize: 10,
+    lineHeight: 13,
+    color: 'rgba(203,213,225,0.65)',
   },
   bottomRow: {
     width: '100%',
     alignItems: 'stretch',
     marginTop: 2,
   },
-  guideButton: {
+  guideButtonOuter: {
     width: '100%',
-    paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: 'rgba(30,64,175,0.55)',
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: 'hidden',
+  },
+  guideButtonGradient: {
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(129,140,248,0.85)',
+    borderColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   guideText: {
-    fontSize: 14,
-    color: '#E0E7FF',
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.94)',
     fontWeight: '600',
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

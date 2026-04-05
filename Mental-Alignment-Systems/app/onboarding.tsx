@@ -236,7 +236,7 @@ export default function OnboardingScreen() {
 
         {step === 5 ? (
           <View style={styles.activityWrap}>
-            <Text style={styles.activityTitle}>Breating Activity</Text>
+            <Text style={styles.activityTitle}>Breathing Activity</Text>
             <View style={styles.activityCard}>
               <BreathingActivityPhase onComplete={() => setActivityCompleted(true)} />
             </View>

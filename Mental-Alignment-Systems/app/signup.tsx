@@ -41,6 +41,8 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -200,24 +202,58 @@ export default function SignUpScreen() {
               autoCorrect={false}
               editable={!isLoading}
             />
-            <TextInput
-              style={styles.input}
-              placeholder={t('auth.passwordPlaceholder6')}
-              placeholderTextColor="rgba(255, 255, 255, 0.4)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
-            <TextInput
-              style={[styles.input, styles.inputLast]}
-              placeholder={t('auth.confirmPasswordPlaceholder')}
-              placeholderTextColor="rgba(255, 255, 255, 0.4)"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              editable={!isLoading}
-            />
+            <View style={styles.passwordFieldWrap}>
+              <TextInput
+                style={[styles.input, styles.inputWithTrailingIcon, styles.passwordInputInner]}
+                placeholder={t('auth.passwordPlaceholder6')}
+                placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                editable={!isLoading}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity
+                style={styles.trailingIconButton}
+                onPress={() => setShowPassword((v) => !v)}
+                disabled={isLoading}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              >
+                <MaterialIcons
+                  name={showPassword ? 'visibility-off' : 'visibility'}
+                  size={22}
+                  color="rgba(255, 255, 255, 0.55)"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.passwordFieldWrap, styles.passwordFieldWrapLast]}>
+              <TextInput
+                style={[styles.input, styles.inputWithTrailingIcon, styles.passwordInputInner]}
+                placeholder={t('auth.confirmPasswordPlaceholder')}
+                placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                editable={!isLoading}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity
+                style={styles.trailingIconButton}
+                onPress={() => setShowConfirmPassword((v) => !v)}
+                disabled={isLoading}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              >
+                <MaterialIcons
+                  name={showConfirmPassword ? 'visibility-off' : 'visibility'}
+                  size={22}
+                  color="rgba(255, 255, 255, 0.55)"
+                />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
               style={[
                 styles.primaryButton,
@@ -352,8 +388,28 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 14,
   },
-  inputLast: {
+  passwordFieldWrap: {
+    width: '100%',
+    marginBottom: 14,
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  passwordFieldWrapLast: {
     marginBottom: 22,
+  },
+  passwordInputInner: {
+    marginBottom: 0,
+  },
+  inputWithTrailingIcon: {
+    paddingRight: 48,
+  },
+  trailingIconButton: {
+    position: 'absolute',
+    right: 4,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
   },
   primaryButton: {
     width: '100%',

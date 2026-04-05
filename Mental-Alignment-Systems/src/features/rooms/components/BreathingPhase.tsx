@@ -10,6 +10,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, FadeInView, Button } from '@/shared/ui';
 import { useTheme } from '@/theme';
+import { BreathingVideoVisual } from './BreathingVideoVisual';
 
 interface BreathingPhaseProps {
   duration?: number; // Duration in seconds (default: 60)
@@ -101,14 +102,9 @@ export function BreathingPhase({ duration = 60, onComplete }: BreathingPhaseProp
             ) : (
               <>
                 <View style={styles.breathingCircle}>
-                  <Animated.View
-                    style={[
-                      styles.circle,
-                      {
-                        transform: [{ scale: scaleAnim }],
-                      },
-                    ]}
-                  />
+                  <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                    <BreathingVideoVisual size={200} />
+                  </Animated.View>
                 </View>
 
                 <Text variant="h2" style={styles.phaseText}>
@@ -165,19 +161,9 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   breathingCircle: {
-    width: 200,
-    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 48,
-  },
-  circle: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 2,
-    borderColor: '#8B5CF6',
-    opacity: 0.6,
   },
   phaseText: {
     marginBottom: 16,

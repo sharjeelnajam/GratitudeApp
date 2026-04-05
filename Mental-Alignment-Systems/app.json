@@ -61,7 +61,8 @@
           "motionPermission": "Allow $(PRODUCT_NAME) to access your device motion for subtle background effects in rooms."
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
