@@ -328,6 +328,15 @@ export default function HomeTab() {
           </Animated.View>
         </View>
 
+        <View style={styles.textLogoWrap}>
+          <Image
+            source={require('../../assets/images/gratitude-keeper-text-logo.png')}
+            style={styles.textLogoImage}
+            resizeMode="contain"
+            accessibilityLabel="Gratitude Keeper text logo"
+          />
+        </View>
+
         <Animated.View
           style={[{ opacity: primaryOpacity, transform: [{ translateY: primaryTranslateY }] }]}
         >
@@ -593,7 +602,7 @@ const styles = StyleSheet.create({
   geometryContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 28,
+    marginBottom: 0,
     position: 'relative',
   },
   particleRingWrapper: {
@@ -648,6 +657,20 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '90%',
     borderRadius: Math.min(width * 0.26, 108),
+  },
+  textLogoWrap: {
+    width: '100%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  textLogoImage: {
+    /** Max width = scroll content (24px padding each side); tall enough to read clearly */
+    width: Math.min(width - 48, 540),
+    height: Math.min((width - 48) * 0.48, 220),
+    alignSelf: 'center',
+    opacity: 0.95,
   },
   innerGlow: {
     position: 'absolute',

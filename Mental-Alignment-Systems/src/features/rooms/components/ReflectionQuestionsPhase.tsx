@@ -6,6 +6,8 @@
  */
 
 import { View, StyleSheet, ScrollView, Image, Dimensions, ImageSourcePropType } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { AmbientBackground, Container, Text, FadeInView, Button } from '@/shared/ui';
 import { useTheme } from '@/theme';
 import { getQuestionsForRoom } from '../roomQuestions';
@@ -60,14 +62,26 @@ export function ReflectionQuestionsPhase({ roomType, onComplete }: ReflectionQue
                 </Text>
                 <View style={styles.questionsList}>
                   {section.questions.map((q, index) => (
-                    <View key={`${section.heading}-${index}`} style={styles.questionRow}>
+                    <LinearGradient
+                      key={`${section.heading}-${index}`}
+                      colors={index % 2 === 0 ? ['#2a2540', '#120f1f'] : ['#3d2f5c', '#1b1430']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.questionTile}
+                    >
+                      <View style={styles.questionTopRow}>
+                        <View style={styles.questionIconBubble}>
+                          <MaterialIcons name="auto-awesome" size={16} color="#c4b5fd" />
+                        </View>
+                        <View style={styles.questionAccentDot} />
+                      </View>
                       <Text variant="body" color="tertiary" style={styles.questionNumber}>
-                        {index + 1}.
+                        Reflection {index + 1}
                       </Text>
                       <Text variant="body" color="secondary" style={styles.questionText}>
                         {q}
                       </Text>
-                    </View>
+                    </LinearGradient>
                   ))}
                 </View>
               </View>
@@ -119,24 +133,50 @@ const styles = StyleSheet.create({
   questionsList: {
     gap: 12,
   },
-  questionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  questionTile: {
+    borderRadius: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255,255,255,0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  questionTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  questionIconBubble: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  questionAccentDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#f9a8d4',
   },
   questionNumber: {
-    marginRight: 10,
-    minWidth: 24,
-    fontSize: 14,
+    fontSize: 11,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: 'rgba(196,181,253,0.95)',
+    marginBottom: 6,
   },
   questionText: {
-    flex: 1,
     lineHeight: 22,
+    color: 'rgba(255,255,255,0.9)',
   },
   actions: {
     marginTop: 24,

@@ -17,24 +17,127 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Text, FadeInView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { typography } from '@/theme/typography';
 
 const { width, height } = Dimensions.get('window');
 const CARD_PADDING_H = 20;
-const BOTTOM_GAP = 12;
-const BOTTOM_BAR_HEIGHT = 72;
+const BOTTOM_BAR_HEIGHT = 76;
 const HEADER_HEIGHT = 100;
 const CARD_MAX_WIDTH = Math.min(width - CARD_PADDING_H * 2, 380);
-/** Each bottom button gets exactly half the row so both stay visible on all screens */
-const BOTTOM_BUTTON_WIDTH = Math.floor((width - CARD_PADDING_H * 2 - BOTTOM_GAP) / 2);
 
 const REFLECTION_QUESTION_IDS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
 const TOTAL = REFLECTION_QUESTION_IDS.length;
+
+type CardGradient = readonly [string, string];
+
+function ReflectionHeader(
+  props: Readonly<{
+    title: string;
+    finishSentenceLine: string;
+    currentIndex: number;
+    questionIds: readonly string[];
+  }>
+) {
+  const { title, finishSentenceLine, currentIndex, questionIds } = props;
+  return (
+    <View style={styles.header}>
+      <Text style={styles.kicker}>Reflection</Text>
+      <Text style={styles.title} numberOfLines={2}>
+        {title}
+      </Text>
+      <Text style={styles.headerSubtitle}>{finishSentenceLine}</Text>
+      <View style={styles.progressRow}>
+        <View style={styles.progressDots}>
+          {questionIds.map((id, i) => (
+            <View
+              key={`dot-${id}`}
+              style={[
+                styles.dot,
+                i === currentIndex && styles.dotActive,
+                i < currentIndex && styles.dotDone,
+              ]}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ReflectionQuestionCard(
+  props: Readonly<{
+    cardGradient: CardGradient;
+    hasAnswer: boolean;
+    inputFocused: boolean;
+    headerIcon: ComponentProps<typeof MaterialIcons>['name'];
+    promptLabel: string;
+    promptText: string;
+    answer: string;
+    onChangeAnswer: (text: string) => void;
+    onFocusInput: () => void;
+    onBlurInput: () => void;
+  }>
+) {
+  const {
+    cardGradient,
+    hasAnswer,
+    inputFocused,
+    headerIcon,
+    promptLabel,
+    promptText,
+    answer,
+    onChangeAnswer,
+    onFocusInput,
+    onBlurInput,
+  } = props;
+
+  return (
+    <View style={styles.questionCardOuter}>
+      <LinearGradient
+        colors={cardGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[
+          styles.questionCardGradient,
+          hasAnswer && styles.questionCardGradientFilled,
+          inputFocused && styles.questionCardGradientFocused,
+        ]}
+      >
+        <View style={styles.reflectTopRow}>
+          <View style={[styles.reflectIconBubble, hasAnswer && styles.reflectIconBubbleActive]}>
+            <MaterialIcons
+              name={hasAnswer ? 'check-circle' : headerIcon}
+              size={18}
+              color={hasAnswer ? '#f9a8d4' : '#c4b5fd'}
+            />
+          </View>
+          <View style={[styles.reflectAccentDot, hasAnswer && styles.reflectAccentDotActive]} />
+        </View>
+        <Text style={styles.promptLabel}>{promptLabel}</Text>
+        <Text style={styles.promptText}>{promptText}</Text>
+        <TextInput
+          style={[styles.input, (hasAnswer || inputFocused) && styles.inputActive]}
+          placeholder="…"
+          placeholderTextColor="rgba(255, 255, 255, 0.4)"
+          value={answer}
+          onChangeText={onChangeAnswer}
+          onFocus={onFocusInput}
+          onBlur={onBlurInput}
+          multiline
+          maxLength={120}
+          selectionColor="rgba(139, 92, 246, 0.6)"
+          autoFocus={false}
+        />
+      </LinearGradient>
+    </View>
+  );
+}
 
 export default function QuestionsScreen() {
   const { t } = useTranslation();
@@ -44,6 +147,7 @@ export default function QuestionsScreen() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [inputFocused, setInputFocused] = useState(false);
 
   const safeIndex = Math.min(Math.max(currentIndex, 0), TOTAL - 1);
   const qId = REFLECTION_QUESTION_IDS[safeIndex] ?? '1';
@@ -89,10 +193,30 @@ export default function QuestionsScreen() {
 
   const keyboardLift = Math.max(0, keyboardHeight - insets.bottom);
 
+  const hasAnswer = useMemo(
+    () => Boolean((answers[qId] ?? '').trim().length),
+    [answers, qId]
+  );
+
+  const cardGradient = useMemo(() => {
+    const pair = safeIndex % 2 === 0 ? (['#2a2540', '#120f1f'] as const) : (['#3d2f5c', '#1a1428'] as const);
+    return pair;
+  }, [safeIndex]);
+
+  const headerIcon = useMemo((): ComponentProps<typeof MaterialIcons>['name'] => {
+    const icons: ComponentProps<typeof MaterialIcons>['name'][] = [
+      'favorite-outline',
+      'light-mode',
+      'spa',
+      'self-improvement',
+    ];
+    return icons[safeIndex % icons.length] ?? 'auto-awesome';
+  }, [safeIndex]);
+
   return (
     <View style={styles.opaqueBackground}>
       <LinearGradient
-        colors={['#1E1B2E', '#2D1B3D', '#3B2F4D']}
+        colors={['#0A0714', '#1E1B2E', '#2D1B3D', '#3B2F4D']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.container}
@@ -104,48 +228,28 @@ export default function QuestionsScreen() {
         >
           {/* Top: header + progress */}
           <FadeInView duration={500} delay={80}>
-            <View style={styles.header}>
-              <Text style={styles.title} numberOfLines={1}>{t('questions.title')}</Text>
-              <View style={styles.progressRow}>
-                <Text style={styles.progressText}>
-                  {currentIndex + 1} of {TOTAL}
-                </Text>
-                <View style={styles.progressDots}>
-                  {REFLECTION_QUESTION_IDS.map((id, i) => (
-                    <View
-                      key={`dot-${id}`}
-                      style={[
-                        styles.dot,
-                        i === currentIndex && styles.dotActive,
-                        i < currentIndex && styles.dotDone,
-                      ]}
-                    />
-                  ))}
-                </View>
-              </View>
-            </View>
+            <ReflectionHeader
+              title={t('questions.title')}
+              finishSentenceLine={`${t('questions.finishSentence')} · ${currentIndex + 1} / ${TOTAL}`}
+              currentIndex={currentIndex}
+              questionIds={REFLECTION_QUESTION_IDS}
+            />
           </FadeInView>
 
           {/* Middle: single question card */}
           <View style={styles.cardWrapper}>
-            <View style={styles.questionCard}>
-              <View style={styles.cardAccent} />
-              <View style={styles.cardInner}>
-                <Text style={styles.promptLabel}>{t('questions.finishSentence')}</Text>
-                <Text style={styles.promptText}>{t(`questions.prompts.${qId}`)}</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="…"
-                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
-                  value={answers[qId] ?? ''}
-                  onChangeText={(text) => updateAnswer(qId, text)}
-                  multiline
-                  maxLength={120}
-                  selectionColor="rgba(139, 92, 246, 0.6)"
-                  autoFocus={false}
-                />
-              </View>
-            </View>
+            <ReflectionQuestionCard
+              cardGradient={cardGradient}
+              hasAnswer={hasAnswer}
+              inputFocused={inputFocused}
+              headerIcon={headerIcon}
+              promptLabel={t('questions.finishSentence')}
+              promptText={t(`questions.prompts.${qId}`)}
+              answer={answers[qId] ?? ''}
+              onChangeAnswer={(text) => updateAnswer(qId, text)}
+              onFocusInput={() => setInputFocused(true)}
+              onBlurInput={() => setInputFocused(false)}
+            />
           </View>
 
           {/* Bottom: Back + Next / Enter Rooms – fixed widths so both always visible */}
@@ -158,33 +262,49 @@ export default function QuestionsScreen() {
               },
             ]}
           >
-            {isFirst ? (
-              <View style={[styles.backPlaceholder, { width: BOTTOM_BUTTON_WIDTH }]} />
-            ) : (
+            {isFirst ? null : (
               <TouchableOpacity
                 onPress={handleBack}
-                activeOpacity={0.7}
-                style={[styles.backButton, { width: BOTTOM_BUTTON_WIDTH }]}
+                activeOpacity={0.88}
+                style={[styles.footerBtnOuter, styles.footerBtnBack]}
               >
-                <Text style={styles.backButtonText}>{t('common.back')}</Text>
+                <LinearGradient
+                  colors={['#3d2f5c', '#1a1428']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.footerGradientSecondary}
+                >
+                  <MaterialIcons name="arrow-back" size={20} color="#c4b5fd" style={styles.footerBackIcon} />
+                  <Text style={styles.footerBtnTextSecondary}>{t('common.back')}</Text>
+                </LinearGradient>
               </TouchableOpacity>
             )}
             <TouchableOpacity
               onPress={handleNext}
-              activeOpacity={0.85}
+              activeOpacity={0.88}
               style={[
-                styles.nextButton,
-                { width: BOTTOM_BUTTON_WIDTH },
-                isLast && styles.enterRoomsButton,
+                styles.footerBtnOuter,
+                isFirst ? styles.footerBtnPrimaryFull : styles.footerBtnPrimary,
               ]}
             >
-              <Text
-                style={[styles.nextButtonText, isLast && styles.enterRoomsButtonText]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
+              <LinearGradient
+                colors={['#1e4550', '#1e1830']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.footerGradientPrimary}
               >
-                {isLast ? t('questions.enterRooms') : t('common.next')}
-              </Text>
+                {isLast ? (
+                  <MaterialIcons name="meeting-room" size={20} color="rgba(255,255,255,0.92)" style={styles.footerPrimaryIcon} />
+                ) : (
+                  <MaterialIcons name="arrow-forward" size={20} color="rgba(255,255,255,0.92)" style={styles.footerPrimaryIcon} />
+                )}
+                <Text
+                  style={isLast ? styles.footerBtnTextPrimaryEmphasis : styles.footerBtnTextPrimary}
+                  numberOfLines={2}
+                >
+                  {isLast ? t('questions.enterRooms') : t('common.next')}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -209,45 +329,56 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
     minHeight: HEADER_HEIGHT,
     justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  kicker: {
+    fontSize: 11,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: 'rgba(186,230,253,0.55)',
+    marginBottom: 8,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.96)',
     textAlign: 'center',
-    fontFamily: typography.fontFamily.serif.default,
-    letterSpacing: 1.2,
-    marginBottom: 10,
+    letterSpacing: 0.2,
+    marginBottom: 8,
+    lineHeight: 28,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: 'rgba(226,232,240,0.65)',
+    textAlign: 'center',
+    marginBottom: 14,
+    letterSpacing: 0.2,
   },
   progressRow: {
     alignItems: 'center',
     gap: 8,
   },
-  progressText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.65)',
-    letterSpacing: 0.5,
-  },
   progressDots: {
     flexDirection: 'row',
-    gap: 5,
+    gap: 8,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   dot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   dotActive: {
-    width: 14,
-    backgroundColor: 'rgba(139, 92, 246, 0.95)',
+    width: 22,
+    backgroundColor: 'rgba(244, 114, 182, 0.95)',
   },
   dotDone: {
-    backgroundColor: 'rgba(139, 92, 246, 0.55)',
+    backgroundColor: 'rgba(139, 92, 246, 0.65)',
   },
   cardWrapper: {
     flex: 1,
@@ -255,35 +386,66 @@ const styles = StyleSheet.create({
     minHeight: 180,
     maxHeight: height * 0.55,
   },
-  questionCard: {
+  questionCardOuter: {
     alignSelf: 'center',
     width: '100%',
     maxWidth: CARD_MAX_WIDTH,
-    borderRadius: 24,
-    padding: 28,
-    paddingBottom: 28,
-    backgroundColor: 'rgba(45, 35, 65, 0.92)',
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 10,
+  },
+  questionCardGradient: {
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(167, 139, 250, 0.35)',
+    borderColor: 'rgba(255,255,255,0.12)',
     overflow: 'hidden',
-    shadowColor: '#A78BFA',
+    minHeight: 220,
+    justifyContent: 'flex-start',
+  },
+  questionCardGradientFilled: {
+    borderColor: 'rgba(244, 114, 182, 0.38)',
+    shadowColor: '#f472b6',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 12,
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
   },
-  cardAccent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: 'rgba(167, 139, 250, 0.6)',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+  questionCardGradientFocused: {
+    borderColor: 'rgba(196, 181, 253, 0.45)',
   },
-  cardInner: {
-    marginTop: 4,
+  reflectTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  reflectIconBubble: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reflectAccentDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(196,181,253,0.6)',
+  },
+  reflectIconBubbleActive: {
+    borderColor: 'rgba(249, 168, 212, 0.45)',
+    backgroundColor: 'rgba(244, 114, 182, 0.2)',
+  },
+  reflectAccentDotActive: {
+    backgroundColor: '#f472b6',
   },
   promptLabel: {
     fontSize: 11,
@@ -308,73 +470,101 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 18,
     borderRadius: 14,
-    backgroundColor: 'rgba(30, 27, 46, 0.6)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(167, 139, 250, 0.3)',
-    minHeight: 52,
+    borderColor: 'rgba(255,255,255,0.14)',
+    minHeight: 56,
+    textAlignVertical: 'top',
+  },
+  inputActive: {
+    borderColor: 'rgba(244, 114, 182, 0.45)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   bottomBar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: BOTTOM_GAP,
+    alignItems: 'stretch',
+    gap: 12,
     minHeight: BOTTOM_BAR_HEIGHT,
     paddingTop: 20,
     flexShrink: 0,
   },
-  backPlaceholder: {
-    minHeight: 52,
+  /** Match `home` inspiration + guide CTAs: radius 22, padding, shadows */
+  footerBtnOuter: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    minHeight: 56,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  backButton: {
-    minHeight: 52,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+  footerBtnBack: {
+    flex: 1,
+    minWidth: 0,
+  },
+  footerBtnPrimary: {
+    flex: 1.25,
+    minWidth: 0,
+  },
+  footerBtnPrimaryFull: {
+    flex: 1,
+    minWidth: 0,
+  },
+  footerGradientSecondary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    justifyContent: 'center',
+    borderColor: 'rgba(196,181,253,0.35)',
+    gap: 8,
+    minHeight: 56,
+  },
+  footerGradientPrimary: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.95)',
-  },
-  nextButton: {
-    minHeight: 52,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.6)',
-    backgroundColor: 'rgba(139, 92, 246, 0.28)',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    gap: 10,
+    minHeight: 56,
   },
-  nextButtonText: {
-    color: '#FFFFFF',
+  footerBackIcon: {
+    marginRight: -2,
+  },
+  footerPrimaryIcon: {
+    marginRight: -2,
+  },
+  footerBtnTextSecondary: {
     fontSize: 15,
+    color: 'rgba(255,255,255,0.94)',
     fontWeight: '600',
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
   },
-  enterRoomsButton: {
-    minHeight: 54,
-    borderRadius: 14,
-    backgroundColor: 'rgba(139, 92, 246, 0.95)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(167, 139, 250, 0.6)',
-    paddingVertical: 15,
-    paddingHorizontal: 12,
-    elevation: 4,
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.45,
-    shadowRadius: 6,
-  },
-  enterRoomsButtonText: {
+  footerBtnTextPrimary: {
     fontSize: 15,
+    lineHeight: 20,
+    color: 'rgba(255,255,255,0.94)',
+    fontWeight: '600',
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+  footerBtnTextPrimaryEmphasis: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: 'rgba(255,255,255,0.96)',
     fontWeight: '700',
-    letterSpacing: 0.6,
+    letterSpacing: 0.2,
+    textAlign: 'center',
+    flexShrink: 1,
   },
 });

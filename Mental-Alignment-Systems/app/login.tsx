@@ -9,7 +9,6 @@ import { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
-  Image,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -19,6 +18,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Text, FadeInView, LanguageSwitcher } from '@/shared/ui';
@@ -32,6 +32,8 @@ import { useTranslation } from 'react-i18next';
 const { width } = Dimensions.get('window');
 const LOGO_SIZE = Math.min(width * 0.28, 100);
 
+const GEOMETRY_LOGO_VIDEO = require('../assets/geometrey-logo-rotating.mp4');
+
 export default function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -41,10 +43,14 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-  const [logoError, setLogoError] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const logoRotation = useRef(new Animated.Value(0)).current;
   const loginRecordedRef = useRef(false);
+
+  const logoVideoPlayer = useVideoPlayer(GEOMETRY_LOGO_VIDEO, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -75,23 +81,6 @@ export default function LoginScreen() {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
-
-  useEffect(() => {
-    const spin = Animated.loop(
-      Animated.timing(logoRotation, {
-        toValue: 1,
-        duration: 20000,
-        useNativeDriver: true,
-      })
-    );
-    spin.start();
-    return () => spin.stop();
-  }, [logoRotation]);
-
-  const spinInterpolate = logoRotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
 
   const displayError = localError ?? error;
 
@@ -159,25 +148,22 @@ export default function LoginScreen() {
           <FadeInView duration={500}>
             <View style={styles.header}>
               <View style={styles.logoWrap}>
-                {logoError ? (
-                  <View
-                    style={[
-                      styles.logoPlaceholder,
-                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
-                    ]}
+                <View
+                  style={[
+                    styles.logoVideoClip,
+                    { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
+                  ]}
+                >
+                  <VideoView
+                    player={logoVideoPlayer}
+                    style={StyleSheet.absoluteFill}
+                    contentFit="cover"
+                    nativeControls={false}
+                    fullscreenOptions={{ enable: false }}
+                    showsTimecodes={false}
+                    surfaceType="textureView"
                   />
-                ) : (
-                  <Animated.Image
-                    source={require('../assets/images/geometry.jpeg')}
-                    style={[
-                      styles.logoImage,
-                      { width: LOGO_SIZE, height: LOGO_SIZE, borderRadius: LOGO_SIZE / 2 },
-                      { transform: [{ rotate: spinInterpolate }] },
-                    ]}
-                    resizeMode="cover"
-                    onError={() => setLogoError(true)}
-                  />
-                )}
+                </View>
               </View>
               <Text style={styles.title}>{t('auth.welcomeBack')}</Text>
               <Text style={styles.subtitle}>{t('auth.signInSubtitle')}</Text>
@@ -326,11 +312,11 @@ const styles = StyleSheet.create({
   logoWrap: {
     marginBottom: 20,
   },
-  logoImage: {
-    backgroundColor: 'transparent',
-  },
-  logoPlaceholder: {
-    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+  logoVideoClip: {
+    overflow: 'hidden',
+    backgroundColor: 'rgba(15, 12, 24, 0.6)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.45)',
   },
   title: {
     fontSize: 28,

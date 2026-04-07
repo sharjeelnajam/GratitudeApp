@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/shared/ui';
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   type FocusMode,
   type DailyTimePreference,
@@ -287,11 +288,24 @@ interface ChoiceButtonProps {
 function ChoiceButton({ label, selected, onPress }: ChoiceButtonProps) {
   return (
     <TouchableOpacity
-      style={[styles.choiceButton, selected && styles.choiceButtonSelected]}
+      style={styles.choiceButtonOuter}
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.88}
     >
-      <Text style={{ ...styles.choiceText, ...(selected ? styles.choiceTextSelected : {}) }}>{label}</Text>
+      <LinearGradient
+        colors={selected ? ['#4a3058', '#1b1430'] : ['#2a2540', '#120f1f']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.choiceTileGradient, selected && styles.choiceTileGradientSelected]}
+      >
+        <View style={styles.choiceTopRow}>
+          <View style={[styles.choiceIconBubble, selected && styles.choiceIconBubbleSelected]}>
+            <MaterialIcons name={selected ? 'check-circle' : 'flare'} size={18} color={selected ? '#f9a8d4' : '#c4b5fd'} />
+          </View>
+          <View style={[styles.choiceAccentDot, selected && styles.choiceAccentDotSelected]} />
+        </View>
+        <Text style={{ ...styles.choiceText, ...(selected ? styles.choiceTextSelected : {}) }}>{label}</Text>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
@@ -333,30 +347,72 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   optionsWrap: {
-    gap: 10,
+    gap: 12,
     width: '100%',
   },
-  choiceButton: {
-    borderRadius: 12,
+  choiceButtonOuter: {
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 7,
+  },
+  choiceTileGradient: {
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    paddingVertical: 14,
+    borderColor: 'rgba(255,255,255,0.12)',
     paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 12,
+    minHeight: 86,
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  choiceTileGradientSelected: {
+    borderColor: 'rgba(244, 114, 182, 0.45)',
+    shadowColor: '#f472b6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+  },
+  choiceTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  choiceIconBubble: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  choiceButtonSelected: {
-    borderColor: 'rgba(167,139,250,0.9)',
-    backgroundColor: 'rgba(139,92,246,0.24)',
+  choiceIconBubbleSelected: {
+    borderColor: 'rgba(249, 168, 212, 0.45)',
+    backgroundColor: 'rgba(244, 114, 182, 0.2)',
+  },
+  choiceAccentDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(196,181,253,0.6)',
+  },
+  choiceAccentDotSelected: {
+    backgroundColor: '#f472b6',
   },
   choiceText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   choiceTextSelected: {
-    color: '#E9DDFF',
+    color: '#FCE7F3',
   },
   readyWrap: {
     width: '100%',

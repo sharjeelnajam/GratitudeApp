@@ -10,6 +10,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Anim
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, FadeInView, PulseView } from '@/shared/ui';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -80,6 +81,7 @@ const INTRO_AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song
 export default function IntroScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const player = useAudioPlayer(INTRO_AUDIO_URL, { downloadFirst: true });
   const status = useAudioPlayerStatus(player);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -151,7 +153,14 @@ export default function IntroScreen() {
 
       {/* Cards Section */}
       <View style={styles.cardsSectionContainer}>
-        <View style={styles.cardsSection}>
+        <View
+          style={[
+            styles.cardsSection,
+            {
+              paddingBottom: Math.max(insets.bottom + 28, 40),
+            },
+          ]}
+        >
           <FadeInView duration={800} delay={400}>
             <View style={styles.historyHeader}>
               <Text style={styles.historyTitle}>{t('intro.yourJourney')}</Text>
@@ -278,7 +287,14 @@ export default function IntroScreen() {
 
         {/* Continue Button */}
         <FadeInView duration={800} delay={1000}>
-          <View style={styles.buttonContainer}>
+          <View
+            style={[
+              styles.buttonContainer,
+              {
+                marginBottom: 0,
+              },
+            ]}
+          >
             <TouchableOpacity
               onPress={handleContinue}
               style={styles.continueButton}
@@ -300,8 +316,8 @@ const styles = StyleSheet.create({
   },
   // Top Section (no rounded corners)
   topSection: {
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingTop: 30,
+    paddingBottom: 24,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -310,7 +326,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   logoContainer: {
-    marginBottom: 20,
+    marginBottom: 12,
   },
   logoCircle: {
     width: 120,
