@@ -266,21 +266,26 @@ export default function IntroScreen() {
             <TouchableOpacity
               onPress={toggleAudio}
               disabled={isLoading}
-              style={styles.audioButton}
-              activeOpacity={0.6}
+              style={styles.audioButtonOuter}
+              activeOpacity={0.88}
             >
-              <View style={styles.audioButtonContent}>
+              <LinearGradient
+                colors={['#3d2f5c', '#1a1428']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.audioButtonGradient}
+              >
                 {isLoading ? (
-                  <MaterialIcons name="hourglass-empty" size={20} color="#8B5CF6" />
+                  <MaterialIcons name="hourglass-empty" size={20} color="#c4b5fd" />
                 ) : isPlaying ? (
-                  <MaterialIcons name="pause" size={20} color="#8B5CF6" />
+                  <MaterialIcons name="pause" size={20} color="#c4b5fd" />
                 ) : (
-                  <MaterialIcons name="play-arrow" size={20} color="#8B5CF6" />
+                  <MaterialIcons name="play-arrow" size={20} color="#c4b5fd" />
                 )}
                 <Text style={styles.audioButtonText}>
                   {isLoading ? t('intro.loadingAudio') : isPlaying ? t('intro.pauseAudio') : t('intro.playAudio')}
                 </Text>
-              </View>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </FadeInView>
@@ -297,10 +302,18 @@ export default function IntroScreen() {
           >
             <TouchableOpacity
               onPress={handleContinue}
-              style={styles.continueButton}
-              activeOpacity={0.6}
+              style={styles.continueButtonOuter}
+              activeOpacity={0.88}
             >
-              <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
+              <LinearGradient
+                colors={['#1e4550', '#1e1830']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.continueButtonGradient}
+              >
+                <MaterialIcons name="arrow-forward" size={20} color="rgba(255,255,255,0.92)" />
+                <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </FadeInView>
@@ -492,27 +505,33 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
   },
-  audioButton: {
+  audioButtonOuter: {
     width: '100%',
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.4)',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
     overflow: 'hidden',
   },
-  audioButtonContent: {
+  audioButtonGradient: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(196,181,253,0.35)',
     gap: 10,
   },
   audioButtonText: {
-    color: '#8B5CF6',
+    color: 'rgba(255,255,255,0.94)',
     fontSize: 15,
-    fontWeight: '400',
-    letterSpacing: 0.5,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   buttonContainer: {
     width: '100%',
@@ -520,23 +539,34 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 20,
   },
-  continueButton: {
+  continueButtonOuter: {
     width: '100%',
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.4)',
-    backgroundColor: 'rgba(139, 92, 246, 0.15)',
-    minHeight: 52,
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: 'hidden',
+  },
+  continueButtonGradient: {
+    width: '100%',
+    minHeight: 56,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    gap: 10,
   },
   continueButtonText: {
-    color: '#8B5CF6',
-    fontSize: 16,
-    fontWeight: '500',
-    letterSpacing: 0.8,
+    color: 'rgba(255,255,255,0.94)',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.2,
     textAlign: 'center',
   },
 });
