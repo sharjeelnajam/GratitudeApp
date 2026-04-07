@@ -8,8 +8,8 @@ export type FocusMode =
   | 'emotional_clarity'
   | 'focus_productivity'
   | 'sleep_restoration'
-  | 'general_wellbeing';
-
+  | 'general_wellbeing'
+  | 'confidence';
 export type DailyTimePreference = 'morning' | 'midday' | 'evening' | 'flexible';
 
 export type EmotionalBaseline =

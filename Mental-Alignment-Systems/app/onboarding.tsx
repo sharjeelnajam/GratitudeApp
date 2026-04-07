@@ -29,6 +29,7 @@ const focusOptions: Array<{ value: FocusMode; label: string }> = [
   { value: 'focus_productivity', label: 'Focus & productivity' },
   { value: 'sleep_restoration', label: 'Sleep & restoration' },
   { value: 'general_wellbeing', label: 'General wellbeing' },
+  { value: 'confidence', label: 'Confidence' },
 ];
 
 const timeOptions: Array<{ value: DailyTimePreference; label: string }> = [

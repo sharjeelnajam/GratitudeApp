@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { RoomSessionState, RoomSession, ClosingChoice } from '../types';
+import { RoomSessionState, RoomSession, ClosingChoice, SharingEntry } from '../types';
 import { LiveEffectVideoBackground } from './LiveEffectVideoBackground';
 import { FireRoomParallaxBackground } from './FireRoomParallaxBackground';
 import { BreathingActivityPhase } from './BreathingActivityPhase';
@@ -49,9 +49,8 @@ export function RoomSessionFlow({
 }: RoomSessionFlowProps) {
   const insets = useSafeAreaInsets();
   const [currentState, setCurrentState] = useState<RoomSessionState>(session.state);
-  const [intention, setIntention] = useState<string>('');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [shares, setShares] = useState<Array<{ participantId: string; participantName: string; content: string }>>([]);
+  const [shares, setShares] = useState<SharingEntry[]>([]);
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [companionModalVisible, setCompanionModalVisible] = useState(false);
   const [localChatMessages, setLocalChatMessages] = useState<ChatMessage[]>([]);
@@ -78,36 +77,35 @@ export function RoomSessionFlow({
   };
 
   const handleBreathingActivityComplete = () => {
-    handleStateChange('body_awareness_audio');
+    handleStateChange(RoomSessionState.BODY_AWARENESS_AUDIO);
   };
 
   const handleBodyAwarenessComplete = () => {
-    handleStateChange('room_entry_note');
+    handleStateChange(RoomSessionState.ROOM_ENTRY_NOTE);
   };
 
   const handleRoomEntryNoteComplete = () => {
-    handleStateChange('relaxation_cards');
+    handleStateChange(RoomSessionState.RELAXATION_CARDS);
   };
 
   const handleRelaxationCardsComplete = () => {
-    handleStateChange('intention_setting');
+    handleStateChange(RoomSessionState.INTENTION_SETTING);
   };
 
   const handleArrivalComplete = () => {
-    handleStateChange('reflection_questions');
+    handleStateChange(RoomSessionState.REFLECTION_QUESTIONS);
   };
 
   const handleReflectionQuestionsComplete = () => {
-    handleStateChange('breathing');
+    handleStateChange(RoomSessionState.BREATHING);
   };
 
   const handleBreathingComplete = () => {
-    handleStateChange('intention_setting');
+    handleStateChange(RoomSessionState.INTENTION_SETTING);
   };
 
-  const handleIntentionComplete = (intentionText: string) => {
-    setIntention(intentionText);
-    handleStateChange('card_selection');
+  const handleIntentionComplete = () => {
+    handleStateChange(RoomSessionState.CARD_SELECTION);
   };
 
   const handleCardSelect = (cardId: string) => {
@@ -115,7 +113,7 @@ export function RoomSessionFlow({
   };
 
   const handleCardSelectionComplete = () => {
-    handleStateChange('sharing');
+    handleStateChange(RoomSessionState.SHARING);
   };
 
   const handleShare = (content: string) => {
@@ -125,15 +123,16 @@ export function RoomSessionFlow({
         participantId: 'participant-1',
         participantName: 'You',
         content,
+        sharedAt: new Date(),
       },
     ]);
   };
 
   const handleSharingComplete = () => {
-    handleStateChange('closing');
+    handleStateChange(RoomSessionState.CLOSING);
   };
 
-  const handleClosingChoice = (choice: ClosingChoice) => {
+  const handleClosingChoice = (_choice: ClosingChoice) => {
     // Handle closing choice
     // In real implementation, would show reading or play audio
     setTimeout(() => {
@@ -144,19 +143,19 @@ export function RoomSessionFlow({
   // Resolve the current phase content (no background here — background mounts once below)
   const currentPhase = (() => {
     switch (currentState) {
-      case 'breathing_activity':
+      case RoomSessionState.BREATHING_ACTIVITY:
         return <BreathingActivityPhase onComplete={handleBreathingActivityComplete} />;
 
-      case 'body_awareness_audio':
+      case RoomSessionState.BODY_AWARENESS_AUDIO:
         return <BodyAwarenessPlayerPhase onComplete={handleBodyAwarenessComplete} />;
 
-      case 'room_entry_note':
+      case RoomSessionState.ROOM_ENTRY_NOTE:
         return <RoomEntryNotePhase onComplete={handleRoomEntryNoteComplete} />;
 
-      case 'relaxation_cards':
+      case RoomSessionState.RELAXATION_CARDS:
         return <RelaxationCardsPhase onComplete={handleRelaxationCardsComplete} />;
 
-      case 'arrival':
+      case RoomSessionState.ARRIVAL:
         return (
           <ArrivalPhase
             roomName={session.roomType.charAt(0).toUpperCase() + session.roomType.slice(1)}
@@ -165,7 +164,7 @@ export function RoomSessionFlow({
           />
         );
 
-      case 'reflection_questions':
+      case RoomSessionState.REFLECTION_QUESTIONS:
         return (
           <ReflectionQuestionsPhase
             roomType={session.roomType}
@@ -173,13 +172,13 @@ export function RoomSessionFlow({
           />
         );
 
-      case 'breathing':
+      case RoomSessionState.BREATHING:
         return <BreathingPhase onComplete={handleBreathingComplete} />;
 
-      case 'intention_setting':
+      case RoomSessionState.INTENTION_SETTING:
         return <IntentionSettingPhase onComplete={handleIntentionComplete} />;
 
-      case 'card_selection':
+      case RoomSessionState.CARD_SELECTION:
         return (
           <CardSelectionPhase
             cards={session.cards}
@@ -191,7 +190,7 @@ export function RoomSessionFlow({
           />
         );
 
-      case 'sharing':
+      case RoomSessionState.SHARING:
         return (
           <SharingPhase
             selectedCardContent={selectedCard?.content || ''}
@@ -202,7 +201,7 @@ export function RoomSessionFlow({
           />
         );
 
-      case 'closing':
+      case RoomSessionState.CLOSING:
         return <ClosingPhase onChoice={handleClosingChoice} />;
 
       default:

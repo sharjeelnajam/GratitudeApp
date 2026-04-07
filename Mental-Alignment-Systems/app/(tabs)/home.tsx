@@ -5,7 +5,17 @@
  * Enter → intro (begin journey).
  */
 
-import { View, StyleSheet, Image, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  Animated,
+  ScrollView,
+  Modal,
+  Pressable,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -19,8 +29,12 @@ import {
   type Last7DayProgress,
   type Last7DayProgressPoint,
 } from '@/features/progress/storage';
+import {
+  INSPIRATION_CARD_IMAGES,
+  pickRandomInspirationIndex,
+} from '@/features/inspiration-cards/inspirationCardAssets';
 
-const { width } = Dimensions.get('window');
+const { width, height: screenHeight } = Dimensions.get('window');
 
 const REFLECTION_TILES = [
   {
@@ -82,6 +96,8 @@ export default function HomeTab() {
     activeDays: 0,
   });
   const [last7Series, setLast7Series] = useState<Last7DayProgressPoint[]>([]);
+  const [inspirationModalVisible, setInspirationModalVisible] = useState(false);
+  const [inspirationCardIndex, setInspirationCardIndex] = useState(0);
 
   const logoScale = useRef(new Animated.Value(0.3)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -206,6 +222,11 @@ export default function HomeTab() {
   );
 
   const maxBarValue = Math.max(1, ...last7Series.map((p) => p.total));
+
+  const openInspiration = () => {
+    setInspirationCardIndex(pickRandomInspirationIndex());
+    setInspirationModalVisible(true);
+  };
 
   return (
     <LinearGradient
@@ -455,6 +476,22 @@ export default function HomeTab() {
           ]}
         >
           <TouchableOpacity
+            style={styles.inspirationButtonOuter}
+            activeOpacity={0.88}
+            onPress={openInspiration}
+          >
+            <LinearGradient
+              colors={['#3d2f5c', '#1a1428']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.inspirationButtonGradient}
+            >
+              <MaterialIcons name="auto-awesome" size={20} color="#c4b5fd" style={styles.inspirationIcon} />
+              <Text style={styles.inspirationButtonText}>Open inspiration</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.guideButtonOuter}
             activeOpacity={0.88}
             onPress={() => router.push('/intro')}
@@ -470,6 +507,39 @@ export default function HomeTab() {
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
+
+      <Modal
+        visible={inspirationModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setInspirationModalVisible(false)}
+      >
+        <View style={styles.inspirationModalRoot}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setInspirationModalVisible(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss"
+          />
+          <View style={styles.inspirationModalCard}>
+            <TouchableOpacity
+              style={styles.inspirationModalClose}
+              onPress={() => setInspirationModalVisible(false)}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Close inspiration"
+            >
+              <MaterialIcons name="close" size={26} color="rgba(255,255,255,0.92)" />
+            </TouchableOpacity>
+            <Image
+              source={INSPIRATION_CARD_IMAGES[inspirationCardIndex]}
+              style={styles.inspirationModalImage}
+              resizeMode="contain"
+              accessibilityLabel="Inspiration card"
+            />
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -757,6 +827,75 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'stretch',
     marginTop: 2,
+    gap: 12,
+  },
+  inspirationButtonOuter: {
+    width: '100%',
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: 'hidden',
+  },
+  inspirationButtonGradient: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(196,181,253,0.35)',
+    gap: 10,
+  },
+  inspirationIcon: { marginTop: 1 },
+  inspirationButtonText: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.94)',
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  inspirationModalRoot: {
+    flex: 1,
+    backgroundColor: 'rgba(5,5,12,0.82)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 32,
+  },
+  inspirationModalCard: {
+    width: Math.min(width - 40, 360),
+    maxHeight: screenHeight * 0.78,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(20,18,32,0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.45,
+    shadowRadius: 24,
+    elevation: 16,
+  },
+  inspirationModalClose: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 2,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inspirationModalImage: {
+    width: '100%',
+    marginTop: 44,
+    height: Math.min(screenHeight * 0.62, width * 1.05),
   },
   guideButtonOuter: {
     width: '100%',
